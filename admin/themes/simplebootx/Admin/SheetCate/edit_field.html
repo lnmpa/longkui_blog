@@ -1,0 +1,137 @@
+<admintpl file="header" />
+<style>
+.form-actions{
+	padding-left:140px !important;
+}
+</style>
+</head>
+<body>
+	<div style="padding: 10px;">
+		<form action="{:U(ACTION_NAME)}" method="post" class="form-horizontal js-ajax-forms" enctype="multipart/form-data">
+			<table class="table table-bordered">
+				<tr>
+					<th width="60">类型</th>
+					<td>
+						<select name="attr_type" class="form-control">
+							<option value="">==请选择==</option>
+							{$taxonomys}
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th width="60">名称</th>
+					<td>
+						<input class="form-control" type="text" name="title" value="{$data['title']}"/>
+					</td>
+				</tr>
+				<tr>
+					<th width="60">字段名</th>
+					<td>
+						<input class="form-control" type="text" name="name" value="{$data['name']}"/>
+					</td>
+				</tr>
+			</table>
+			<input type="hidden" name="cate_id" value="{$data['cate_id']}"/>
+			<input type="hidden" name="id" value="{$data['id']}"/>
+		</form>
+	</div>
+	<script type="text/javascript" src="__PUBLIC__/js/common.js"></script>
+	<script type="text/javascript">
+		$(function() {
+			Wind.use('validate', 'ajaxForm', 'artDialog', function() {
+				
+				var form = $('form.js-ajax-forms');
+				
+				//ie处理placeholder提交问题
+				if ($.browser && $.browser.msie) {
+					form.find('[placeholder]').each(function() {
+						var input = $(this);
+						if (input.val() == input.attr('placeholder')) {
+							input.val('');
+						}
+					});
+				}
+				
+				var formloading = false;
+				//表单验证开始
+				form.validate({
+					//是否在获取焦点时验证
+					onfocusout : true,
+					//是否在敲击键盘时验证
+					onkeyup : false,
+					//当鼠标掉级时验证
+					onclick : false,
+					//验证错误
+					showErrors : function(errorMap, errorArr) {
+						//errorMap {'name':'错误信息'}
+						//errorArr [{'message':'错误信息',element:({})}]
+						try {
+							$(errorArr[0].element).focus();
+							art.dialog({
+								id : 'error',
+								icon : 'error',
+								lock : true,
+								fixed : true,
+								background : "#CCCCCC",
+								opacity : 0,
+								content : errorArr[0].message,
+								cancelVal : '确定',
+								cancel : function() {
+									$(errorArr[0].element).focus();
+								}
+							});
+						} catch (err) {
+						}
+					},
+					//验证规则
+					rules : {
+						'attr_type' : "required",
+						'title' : "required",
+						'name' : "required",
+					},
+					//验证未通过提示消息
+					messages : {
+						'attr_type' : '请选择字段类型！',
+						'title' : '请填写字段名称！',
+						'name' : '请填写字段名！',
+					},
+					//给未通过验证的元素加效果,闪烁等
+					highlight : false,
+					//是否在获取焦点时验证
+					onfocusout : false,
+					//验证通过，提交表单
+					submitHandler : function(forms) {
+						if (formloading)
+							return;
+						$(forms).ajaxSubmit({
+							url : form.attr('action'), //按钮上是否自定义提交地址(多按钮情况)
+							dataType : 'json',
+							beforeSubmit : function(arr, $form, options) {
+								formloading = true;
+							},
+							success : function(data, statusText, xhr, $form) {
+								formloading = false;
+								if (data.status) {
+									if(data.type=='add'){
+										var id = data.id;
+										var title = data.title;
+										var name = data.name;
+										var attr_type = data.attr_type;
+										var edit_url = data.edit_url;
+										var delete_url = data.delete_url;
+										var parent_window = parent.art.dialog({id: 'design'}).iframe.contentWindow;
+										parent_window.add_callback(id,title,name,attr_type,edit_url,delete_url);
+									}
+									
+								} else {
+									artdialog_alert(data.info);
+								}
+							}
+						});
+					}
+				});
+			});
+		});
+	</script>
+</body>
+</html>

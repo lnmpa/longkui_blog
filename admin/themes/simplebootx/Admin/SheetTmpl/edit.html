@@ -1,0 +1,215 @@
+<admintpl file="header" />
+<script src="__PUBLIC__/js/jquery.dragsort-0.5.2.min.js"></script>
+<style>
+table.table{
+	margin:0 !important;
+}
+.form-actions{
+	padding-left:140px !important;
+}
+</style>
+</head>
+<body>
+	<div class="wrap js-check-wrap">
+		<ul class="nav nav-tabs">
+			<li><a href="{:U('index')}">表单模版</a></li>
+			<li class="active"><a href="{:U('add')}">添加模版</a></li>
+		</ul>
+		<form class="form js-ajax-form" action="" method="post" enctype="multipart/form-data">
+			<div class="tabbable">
+				<div class="tabs-left">
+					<ul class="nav nav-pills nav-stacked">
+						<li class="active"><a href="#A" data-toggle="tab">基本信息</a></li>
+		        		<if condition="ACTION_NAME eq 'edit'"><li><a href="#B" data-toggle="tab">字段信息</a></li></if>
+					</ul>
+				</div>
+		        <div class="tab-content">
+		          <div class="tab-pane active" id="A">
+						<fieldset>
+							<div class="form-group">
+								<label>模版名称<span class="form-required">*</span></label>
+								<input class="form-control" type="text" name="name" value="{$data['name']}">
+							</div>
+							<div class="form-group">
+								<label>审核</label>
+								<div>
+									<label class="radio-inline js-icheck"><input class="form-control" type="radio" name="status" value="1" <if condition="$data['status'] neq '0'">checked</if>>审核通过</label>
+									<label class="radio-inline js-icheck"><input class="form-control" type="radio" name="status" value="0" <if condition="$data['status'] eq '0'">checked</if>>待审核</label>
+								</div>
+							</div>
+						</fieldset>
+		          </div>
+		          <div class="tab-pane" id="B">
+						<fieldset>
+							<table class="table table-bordered">
+							    <tr>
+							    	<td>
+							    		<table class="table table-bordered">
+				                    		<tr>
+				                    			<td width="10%"><b>序号</b></td>
+												<td width="45%"><b>名称</b></td>
+												<td width="15%"><b>字段名</b></td>
+												<td width="15%"><b>字段类型</b></td>
+												<td width="15%"><b>操作</b></td>
+				                    		</tr>
+				                    	</table>
+							    		<ul id="list1" class="nav" style="">
+							    			<foreach name="list" item="val">
+							    			<li>
+					                            <div>
+				                                	<table class="table table-bordered accordion-heading{$val.id}" data-id="{$val.id}">
+				                                		<tr>
+				                                			<td width="10%">{$key+1}</td>
+															<td width="45%">{$val.title}</td>
+															<td width="15%">{$val.name}</td>
+															<td width="15%">{$val.attr_type}</td>
+															<td width="15%">
+																<a class="label label-primary field_edit" href="{:U('edit_field?id='.$val['id'])}">编辑</a>
+																<a class="label label-danger label-important field_delete" href="{:U('delete_field?id='.$val['id'])}">删除</a>
+															</td>
+				                                		</tr>
+				                                	</table>
+					                            </div>
+											</li>
+							    			</foreach>
+										</ul>
+										<a class="btn btn-primary field_add">新增字段</a><br><br>提示：鼠标按住列表拖动排序！
+							    	</td>
+								</tr>
+							</table>
+							<input name="sort_order" type="hidden" />
+						</fieldset>
+		          </div>
+		        </div>
+		    </div>
+		    <div class="form-actions">
+		    	<input class="form-control" type="hidden" name="id" value="{$data['id']}"/>
+		     	<button class="btn btn-primary js-ajax-submit" type="submit">{:L('SAVE')}</button>
+		      	<a class="btn btn-default" href="javascript:history.back(-1);">{:L('BACK')}</a>
+		    </div>
+		</form>
+	</div>
+	<script type="text/javascript" src="__PUBLIC__/js/common.js"></script>
+	<script type="text/javascript">
+	    $("#list1").dragsort({
+	        dragSelector: "div",
+	        dragBetween: true,
+	        dragEnd: saveOrder,
+	        //placeHolderTemplate: "<li class='placeHolder'><div></div></li>"
+	    });
+	    
+	    function saveOrder(){
+	        var data = $("#list1 li").map(function(){
+	            return $(this).children().html();
+	        }).get();
+			var id_arr = [];
+			for (var i = 0; i < data.length; i++){
+				//console.log(data[i]);
+				var key = i+1;
+				var id = $(data[i]).attr("data-id");
+				$(".accordion-heading"+id).find("td").first().html(key);
+				id_arr[i] = id;
+			};
+	        $("input[name=sort_order]").val(id_arr.join("|"));
+	    };
+		
+		$(".form").on("click",".field_edit",function(){
+			var $this = $(this);
+			var href = $(this).attr("href");
+			Wind.use("artDialog","iframeTools",function(){
+		        art.dialog.open(href, {
+			        title: "编辑字段",
+			        id: 'field_edit',
+			        width: '350px',
+			        height: '200px',
+			        lock: true,
+			        fixed: true,
+			        background:"#CCCCCC",
+			        opacity:0,
+			        ok: function(){
+			            var iframewindow = this.iframe.contentWindow;
+						var form = iframewindow.$(".form-horizontal");
+						form.submit();
+						$this.parents('tr').find("td").eq(1).html(form.find("input[name='title']").val());
+						$this.parents('tr').find("td").eq(2).html(form.find("input[name='name']").val());
+						$this.parents('tr').find("td").eq(3).html(form.find("select[name='attr_type']").find(":selected").html());
+						return true;
+			        },
+			        cancel: true
+			    });
+		    });
+			return false;
+		})
+		
+		$(".form").on("click",".field_add",function(){
+			var href = "{:U('add_field?cate_id='.$data['id'])}";
+			Wind.use("artDialog","iframeTools",function(){
+		        art.dialog.open(href, {
+			        title: "新增字段",
+			        id: 'field_add',
+			        width: '350px',
+			        height: '200px',
+			        lock: true,
+			        fixed: true,
+			        background:"#CCCCCC",
+			        opacity:0,
+			        ok: function(){
+			            var iframewindow = this.iframe.contentWindow;
+						var form = iframewindow.$(".form-horizontal");
+						form.submit();
+						
+						return false;
+			        },
+			        cancel: true
+			    });
+		    });
+			return false;
+		})
+		
+		$(".form").on("click",".field_delete",function(){
+			var $_this = this;
+			var $this = $(this);
+			var href = $this.attr("href");
+			Wind.use('artDialog', function () {
+				art.dialog({
+	                title: false,
+	                icon: 'question',
+					follow:$_this,
+	                content: '确定要删除吗？',
+	                okVal: "确认删除",
+	                ok: function () {
+	                    $.get(href,"",function(data){
+							if (data.status) {
+								$this.parents('li:eq(0)').remove();
+								saveOrder();
+							} else {
+								artdialog_alert(data.info);
+							}
+						})
+						return true;
+	                },
+	                cancelVal: '取消',
+	                cancel: true
+	            });
+			});
+			return false;
+		})
+		
+		function add_callback(id,title,name,attr_type,edit_url,delete_url){
+			var key = $("#list1").children("li").length + 1;
+			var html = "";
+			html += "<li><div><table class='table table-bordered accordion-heading"+id+"' data-id='"+id+"'><tr>";
+			html += "<td width='10%'>"+key+"</td>";
+			html += "<td width='45%'>"+title+"</td>";
+			html += "<td width='15%'>"+name+"</td>";
+			html += "<td width='15%'>"+attr_type+"</td>";
+			html += "<td width='15%'><a class='label label-primary field_edit' href='"+edit_url+"'>编辑</a>&nbsp;";
+			html += "<a class='label label-danger field_delete' href='"+delete_url+"'>删除</a></td>";
+        	html += "</tr></table></div></li>";
+			$("#list1").append(html);
+			saveOrder();
+			art.dialog.list['field_add'].close();
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<admintpl file="header" />
+</head>
+<body>
+	<div class="wrap js-check-wrap">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="javascript:;">类型列表</a></li>
+			<li><a href="{:U('Category/add',array('cate_id'=>$cate_id,'type_id'=>$type_id))}">添加类型</a></li>
+		</ul>
+		<form class="well form-inline" method="get" id="typeid-form">
+			<select class="form-control input-sm" name="type_id" style="width: 200px;" id="selected-typeid">
+				<foreach name="cate_list" item="vo">
+				<php>$cid_select=$vo['id']==$type_id?"selected":"";</php>
+				<option value="{$vo.id}" {$cid_select}>{$vo.name}</option>
+				</foreach>
+			</select>
+		</form>
+		<form class="js-ajax-form" action="" method="post">
+			<div class="table-actions">
+			</div>
+			<table class="table table-hover table-bordered table-list" id="menus-table">
+				<thead>
+					<tr>
+						<th width="50" style="text-align:center;"><label><input type="checkbox" class="js-check-all" data-direction="x" data-checklist="js-check-x"></label></th>
+						<th width="50">ID</th>
+						<th>分类名称</th>
+						<th width="80">分类别名</th>
+						<th>目录路径</th>
+						<th width="50">排序值</th>
+						<th width="50" style="text-align:center;">审核</th>
+						<th width="180">操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					{$taxonomys}
+				</tbody>
+				<tfoot>
+					<tr>
+						<th width="50" style="text-align:center;"><label><input type="checkbox" class="js-check-all" data-direction="x" data-checklist="js-check-x"></label></th>
+						<th width="50">ID</th>
+						<th>分类名称</th>
+						<th width="80">分类别名</th>
+						<th>目录路径</th>
+						<th width="50">排序值</th>
+						<th width="50" style="text-align:center;">审核</th>
+						<th width="180">操作</th>
+					</tr>
+				</tfoot>
+			</table>
+			<div class="table-actions">
+			</div>
+		</form>
+	</div>
+	<script src="__PUBLIC__/js/common.js"></script>
+	<script>
+		$(".table-list").on("change",".input-ajax",function(){
+			var id = $(this).parents('tr').attr("data-id");
+			var value = $(this).val();
+			var type = $(this).data("type");
+			parent.$loading.show();
+			if(id != null && value != null){
+				$.post("{:U('status')}",{id:id,value:value,type:type},function(data){
+					parent.$loading.hide();
+				})
+			}
+		})
+		
+		$(".table-list").on("click",".fa-check",function(){
+			var obj = $(this);
+			var id = obj.parents('tr').attr("data-id");
+			var type = obj.attr("data-type");
+			top.$loading.show();
+			$.post("{:U('status')}",{id:id,value:0,type:type},function(data){
+				obj.removeClass("fa-check");
+				obj.addClass("fa-close");
+				top.$loading.hide();
+			})
+		})
+		
+		$(".table-list").on("click",".fa-close",function(){
+			var obj = $(this);
+			var id = obj.parents('tr').attr("data-id");
+			var type = obj.attr("data-type");
+			top.$loading.show();
+			$.post("{:U('status')}",{id:id,value:1,type:type},function(data){
+				obj.removeClass("fa-close");
+				obj.addClass("fa-check");
+				top.$loading.hide();
+			})
+		})
+		
+		$(function() {
+			$("#selected-typeid").change(function() {
+				$("#typeid-form").submit();
+			});
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<admintpl file="header" />
+<link href="__TMPL__Public/assets/css/lib/bootstrap-responsive.min.css" rel="stylesheet">
+<link href="__TMPL__Public/assets/css/custom.css" rel="stylesheet">
+</head>
+<body>
+<div class="wrap js-check-wrap">
+	<ul class="nav nav-tabs">
+		<li><a href="{:U('index')}">表单列表</a></li>
+		<li class="active"><a href="javascript:;">{$meta_title}</a></li>
+	</ul>
+
+	<table class="table table-bordered">
+		<tr>
+			<td>
+				
+            <div class="container">
+                <div class="row clearfix">
+                    <!-- Building Form. -->
+                    <div class="span6">
+                        <div class="clearfix">
+                            <h2>你的表单</h2>
+                            <hr>
+                            <div id="build">
+                                <form id="target" class="form-horizontal">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- / Building Form. -->
+					<!-- Components -->
+                    <div class="span6">
+                        <h2>拖放组件(下方组件拖放到左边表中)</h2>
+                        <hr>
+                        <div class="tabbable">
+                            <ul class="nav nav-tabs" id="formtabs">
+                                <!-- Tab nav -->
+                            </ul>
+                            <form class="form-horizontal" id="components">
+                                <fieldset>
+                                    <div class="tab-content">
+                                        <!-- Tabs of snippets go here -->
+                                    </div>
+                                </fieldset>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- / Components -->
+                </div>
+            </div>
+            <!-- /container -->
+				
+			</td>
+		</tr>
+	</table>
+	
+	<div class="form-actions">
+		<input type="hidden" name="id" value="{$data['id']}"/>
+		<button class="btn btn-primary js-ajax-submit" type="submit">提交</button>
+		<a class="btn btn-default" href="javascript:history.back(-1);">返回</a>
+	</div>
+	
+	
+</div>
+<script data-main="__TMPL__Public/assets/js/main-built.js" src="__TMPL__Public/assets/js/lib/require.js" ></script>
+<script type="text/javascript" src="__PUBLIC__/js/common.js"></script>
+</body>
+</html>

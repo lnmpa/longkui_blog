@@ -1,0 +1,271 @@
+<admintpl file="header" />
+<script src="__PUBLIC__/js/jquery.dragsort-0.5.2.min.js"></script>
+<style>
+form.form-horizontal{
+	margin:0 !important;
+}
+table.table{
+	margin:0 !important;
+}
+.form-actions{
+	padding-left:140px !important;
+}
+</style>
+</head>
+<body>
+	<div style="padding: 10px;">
+		<form action="{:U('design')}" method="post" class="form-horizontal js-ajax-forms" enctype="multipart/form-data">
+			<table class="table table-bordered">
+			    <tr>
+			    	<td>
+			    		<table class="table table-bordered">
+                    		<tr>
+                    			<td width="10%"><b>序号</b></td>
+								<td width="45%"><b>名称</b></td>
+								<td width="15%"><b>字段名</b></td>
+								<td width="15%"><b>字段类型</b></td>
+								<td width="15%"><b>操作</b></td>
+                    		</tr>
+                    	</table>
+			    		<ul id="list1" class="nav" style="">
+			    			<foreach name="list" item="val">
+			    			<li>
+	                            <div>
+                                	<table class="table table-bordered accordion-heading{$val.id}" data-id="{$val.id}">
+                                		<tr>
+                                			<td width="10%">{$key+1}</td>
+											<td width="45%">{$val.title}</td>
+											<td width="15%">{$val.name}</td>
+											<td width="15%">{$val.attr_type}</td>
+											<td width="15%">
+												<a class="label label-primary field_edit" href="{:U('edit_field?id='.$val['id'])}">编辑</a>
+												<a class="label label-danger label-important field_delete" href="{:U('delete_field?id='.$val['id'])}">删除</a>
+											</td>
+                                		</tr>
+                                	</table>
+	                            </div>
+							</li>
+			    			</foreach>
+						</ul>
+						<button class="btn btn-primary field_add">新增字段</button>
+			    	</td>
+				</tr>
+			</table>
+			<input name="sort_order" type="hidden" />
+			<input type="hidden" name="id" value="{$id}"/>
+		</form>
+	</div>
+	<script type="text/javascript">
+	    $("#list1").dragsort({
+	        dragSelector: "div",
+	        dragBetween: true,
+	        dragEnd: saveOrder,
+	        //placeHolderTemplate: "<li class='placeHolder'><div></div></li>"
+	    });
+	    
+	    function saveOrder(){
+	        var data = $("#list1 li").map(function(){
+	            return $(this).children().html();
+	        }).get();
+			var id_arr = [];
+			for (var i = 0; i < data.length; i++){
+				//console.log(data[i]);
+				var key = i+1;
+				var id = $(data[i]).attr("data-id");
+				$(".accordion-heading"+id).find("td").first().html(key);
+				id_arr[i] = id;
+			};
+	        $("input[name=sort_order]").val(id_arr.join("|"));
+	    };
+		
+		$(".form-horizontal").on("click",".field_edit",function(){
+			var $this = $(this);
+			var href = $(this).attr("href");
+			Wind.use("artDialog","iframeTools",function(){
+		        art.dialog.open(href, {
+			        title: "编辑字段",
+			        id: new Date().getTime(),
+			        width: '350px',
+			        height: '200px',
+			        lock: true,
+			        fixed: true,
+			        background:"#CCCCCC",
+			        opacity:0,
+			        ok: function(){
+			            var iframewindow = this.iframe.contentWindow;
+						var form = iframewindow.$(".form-horizontal");
+						form.submit();
+						$this.parents('tr').find("td").eq(1).html(form.find("input[name='title']").val());
+						$this.parents('tr').find("td").eq(2).html(form.find("input[name='name']").val());
+						$this.parents('tr').find("td").eq(3).html(form.find("select[name='attr_type']").find(":selected").html());
+						return true;
+			        },
+			        cancel: true
+			    });
+		    });
+			return false;
+		})
+		
+		$(".form-horizontal").on("click",".field_add",function(){
+			var href = "{:U('add_field?cate_id='.$id)}";
+			Wind.use("artDialog","iframeTools",function(){
+		        art.dialog.open(href, {
+			        title: "新增字段",
+			        id: new Date().getTime(),
+			        width: '350px',
+			        height: '200px',
+			        lock: true,
+			        fixed: true,
+			        background:"#CCCCCC",
+			        opacity:0,
+			        ok: function(){
+			            var iframewindow = this.iframe.contentWindow;
+						var form = iframewindow.$(".form-horizontal");
+						form.submit();
+						
+						return false;
+			        },
+			        cancel: true
+			    });
+		    });
+			return false;
+		})
+		
+		$(".form-horizontal").on("click",".field_delete",function(){
+			var $this = $(this);
+			var href = $this.attr("href");
+			var msg = "点击确认将删除该库下面所有的<br>该字段信息，并且无法恢复，但不<br>会影响其它的字段，是否确认?";
+			Wind.use('artDialog', function () {
+				art.dialog({
+	                title: false,
+	                icon: 'question',
+	                content: msg ? msg : '确定要删除吗？',
+	                okVal: "确认删除",
+	                ok: function () {
+	                    $.get(href,"",function(data){
+							if (data.status) {
+								$this.parents('li:eq(0)').remove();
+								saveOrder();
+							} else {
+								artdialog_alert(data.info);
+							}
+						})
+						return true;
+	                },
+	                cancelVal: '取消',
+	                cancel: true
+	            });
+			});
+			return false;
+		})
+		
+		function add_callback(id,title,name,attr_type,edit_url,delete_url){
+			var key = $("#list1").children("li").length + 1;
+			var html = "";
+			html += "<li><div><table class='table table-bordered accordion-heading"+id+"' data-id='"+id+"'><tr>";
+			html += "<td width='10%'>"+key+"</td>";
+			html += "<td width='45%'>"+title+"</td>";
+			html += "<td width='15%'>"+name+"</td>";
+			html += "<td width='15%'>"+attr_type+"</td>";
+			html += "<td width='15%'><a class='label label-primary field_edit' href='"+edit_url+"'>编辑</a>&nbsp;";
+			html += "<a class='label label-danger field_delete' href='"+delete_url+"'>删除</a></td>";
+        	html += "</tr></table></div></li>";
+			$("#list1").append(html);
+			
+			saveOrder();
+		}
+	</script>
+	<script type="text/javascript" src="__PUBLIC__/js/common.js"></script>
+	<script type="text/javascript">
+		$(function() {
+			Wind.use('validate', 'ajaxForm', 'artDialog', function() {
+				
+				var form = $('form.js-ajax-forms');
+				
+				//ie处理placeholder提交问题
+				if ($.browser && $.browser.msie) {
+					form.find('[placeholder]').each(function() {
+						var input = $(this);
+						if (input.val() == input.attr('placeholder')) {
+							input.val('');
+						}
+					});
+				}
+				
+				var formloading = false;
+				//表单验证开始
+				form.validate({
+					//是否在获取焦点时验证
+					onfocusout : true,
+					//是否在敲击键盘时验证
+					onkeyup : false,
+					//当鼠标掉级时验证
+					onclick : false,
+					//验证错误
+					showErrors : function(errorMap, errorArr) {
+						//errorMap {'name':'错误信息'}
+						//errorArr [{'message':'错误信息',element:({})}]
+						try {
+							$(errorArr[0].element).focus();
+							art.dialog({
+								id : 'error',
+								icon : 'error',
+								lock : true,
+								fixed : true,
+								background : "#CCCCCC",
+								opacity : 0,
+								content : errorArr[0].message,
+								cancelVal : '确定',
+								cancel : function() {
+									$(errorArr[0].element).focus();
+								}
+							});
+						} catch (err) {
+						}
+					},
+					//验证规则
+					rules : {
+						'contain_nh' : "required",
+						'finish_nh' : "required",
+						'contain_qy' : "required",
+						'finish_qy' : "required",
+						'finish_percent' : "required",
+					},
+					//验证未通过提示消息
+					messages : {
+						'contain_nh' : '请填写涉及农户数！',
+						'finish_nh' : '请填写完成农户数！',
+						'contain_qy' : '请填写涉及企业数！',
+						'finish_qy' : '请填写完成企业数！',
+						'finish_percent' : '请填写完成率！',
+					},
+					//给未通过验证的元素加效果,闪烁等
+					highlight : false,
+					//是否在获取焦点时验证
+					onfocusout : false,
+					//验证通过，提交表单
+					submitHandler : function(forms) {
+						if (formloading)
+							return;
+						$(forms).ajaxSubmit({
+							url : form.attr('action'), //按钮上是否自定义提交地址(多按钮情况)
+							dataType : 'json',
+							beforeSubmit : function(arr, $form, options) {
+								formloading = true;
+							},
+							success : function(data, statusText, xhr, $form) {
+								formloading = false;
+								if (data.status) {
+									parent.window.location.reload();
+								} else {
+									artdialog_alert(data.info);
+								}
+							}
+						});
+					}
+				});
+			});
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<admintpl file="header" />
+<style type="text/css">
+.pic-list li {
+	margin-bottom: 5px;
+}
+</style>
+</head>
+<body>
+	<div class="wrap js-check-wrap">
+		<ul class="nav nav-tabs">
+	        <li class="active"><a href="#A" data-toggle="tab">个人基本资料</a></li>
+	        <li><a href="#B" data-toggle="tab">企业基本资料</a></li>
+			<li><a href="#C" data-toggle="tab">拟开店铺位置及周围环境</a></li>
+			<li><a href="#D" data-toggle="tab">开店投资和经营计划</a></li>
+			<li><a href="#E" data-toggle="tab">对品牌对的经营设想</a></li>
+	    </ul>
+		<div class="tabbable">
+		        <div class="tab-content">
+		          <div class="tab-pane active" id="A">
+						<fieldset>
+							<table class="table table-bordered">
+								<tr>
+									<th width="120">姓名</th>
+									<td>
+										{$data['name']}
+									</td>
+								</tr>
+								<tr>
+									<th>性别</th>
+									<td>
+										{$data['sex']}
+									</td>
+								</tr>
+								<tr>
+									<th>学历</th>
+									<td>
+										{$data['education']}
+									</td>
+								</tr>
+								<tr>
+									<th>身份证号</th>
+									<td>
+										{$data['idcard']}
+									</td>
+								</tr>
+								<tr>
+									<th>手机号码</th>
+									<td>
+										{$data['mobile']}
+									</td>
+								</tr>
+								<tr>
+									<th>E-mail</th>
+									<td>
+										{$data['email']}
+									</td>
+								</tr>
+							</table>
+						</fieldset>
+					</div>
+					<div class="tab-pane" id="B">
+						<fieldset>
+							<table class="table table-bordered">
+								<tr>
+									<th width="120">公司名称</th>
+									<td>
+										{$data['company_name']}
+									</td>
+								</tr>
+								<tr>
+									<th>注册资本</th>
+									<td>
+										{$data['capital']}
+									</td>
+								</tr>
+								<tr>
+									<th>企业法人</th>
+									<td>
+										{$data['corporate']}
+									</td>
+								</tr>
+								<tr>
+									<th>经营范围</th>
+									<td>
+										{$data['business']}
+									</td>
+								</tr>
+								<tr>
+									<th>固定电话</th>
+									<td>
+										{$data['tel']}
+									</td>
+								</tr>
+								<tr>
+									<th>传真</th>
+									<td>
+										{$data['fax']}
+									</td>
+								</tr>
+								<tr>
+									<th>详细地址</th>
+									<td>
+										{$data['address']}
+									</td>
+								</tr>
+								<tr>
+									<th>现正经营的品牌</th>
+									<td>
+										{$data['brand']}
+									</td>
+								</tr>
+								<tr>
+									<th>开店数</th>
+									<td>
+										{$data['shop']}
+									</td>
+								</tr>
+								<tr>
+									<th>业绩</th>
+									<td>
+										{$data['performance']}
+									</td>
+								</tr>
+								<tr>
+									<th>企业愿景</th>
+									<td>
+										{$data['vision']}
+									</td>
+								</tr>
+							</table>
+						</fieldset>
+					</div>
+					<div class="tab-pane" id="C">
+						<fieldset>
+							<table class="table table-bordered">
+								<tr>
+									<th width="120">拟开城市</th>
+									<td>
+										{$data['city']}
+									</td>
+								</tr>
+								<tr>
+									<th>城市人口</th>
+									<td>
+										{$data['population']}
+									</td>
+								</tr>
+								<tr>
+									<th>发达情况</th>
+									<td>
+										{$data['developed']}
+									</td>
+								</tr>
+								<tr>
+									<th>消费水准</th>
+									<td>
+										{$data['consumption']}
+									</td>
+								</tr>
+								<tr>
+									<th>当地销售最佳的商场名称</th>
+									<td>
+										{$data['market']}
+									</td>
+								</tr>
+								<tr>
+									<th>拟开店铺详址</th>
+									<td>
+										{$data['shop_size']}
+									</td>
+								</tr>
+								<tr>
+									<th>店铺面积</th>
+									<td>
+										{$data['area']}
+									</td>
+								</tr>
+								<tr>
+									<th>年租金</th>
+									<td>
+										{$data['rent']}
+									</td>
+								</tr>
+								<tr>
+									<th>铺钱平均每小时人流量</th>
+									<td>
+										上午{$data['morning']}，下午{$data['afternoon']}
+									</td>
+								</tr>
+							</table>
+						</fieldset>
+					</div>
+					<div class="tab-pane" id="D">
+						<fieldset>
+							<table class="table table-bordered">
+								<tr>
+									<th width="120">开店形式</th>
+									<td>
+										{$data['type']}
+									</td>
+								</tr>
+								<tr>
+									<th>开店时间</th>
+									<td>
+										{$data['datetime']}
+									</td>
+								</tr>
+								<tr>
+									<th>投资计划</th>
+									<td>
+										{$data['plan']}
+									</td>
+								</tr>
+								<tr>
+									<th>保证金</th>
+									<td>
+										{$data['deposit']}
+									</td>
+								</tr>
+							</table>
+						</fieldset>
+					</div>
+					<div class="tab-pane" id="E">
+						<fieldset>
+							<table class="table table-bordered">
+								<tr>
+									<th width="120">经营设想</th>
+									<td>
+										{$data['idea']}
+									</td>
+								</tr>
+							</table>
+						</fieldset>
+					</div>
+				</div>
+		    </div>
+			<div class="form-actions">
+				<a class="btn btn-default" href="javascript:history.back(-1);">返回</a>
+			</div>
+	</div>
+</body>
+</html>

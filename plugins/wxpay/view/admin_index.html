@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+    <include file="public/head"/>
+    <title>wxpay</title>
+    <meta name="description" content="wxpay">
+    <meta name="keywords" content="wxpay">
+</head>
+<body>
+<div class="wrap js-check-wrap">
+    <ul class="nav nav-tabs">
+        <li class="active"><a>wxpay</a></li>
+    </ul>
+    <div class="common-form">
+        <div class="well">
+            <p>
+                <b>插件根目录:</b>__PLUGIN_ROOT__
+            </p>
+            <p>
+                <b>插件模板根目录:</b>__PLUGIN_TMPL__
+            </p>
+            <p>
+                <b>支付授权目录:</b>你的域名/plugin/wxpay/index/wxpay/id/
+            </p>
+            <p>
+                <b>支付插件调用:</b>cmf_plugin_url('Wxpay://Index/wxpay',array('id'=>'xxxx'))
+                <span>(xxx是你的订单号,注意提交过的订单号不能在拿去提交支付) <a href="{:cmf_plugin_url('Wxpay://Index/wxpay',array('id'=>$orderid))}" target="_blank">访问</a></span>
+            </p>
+           <p>
+                <b>支付回调地址:</b>默认cmf_plugin_url('Wxpay://Index/notify',array(),true);
+            </p> 
+        </div>
+    </div>
+</div>
+<include file="public/scripts"/>
+</body>
+</html>

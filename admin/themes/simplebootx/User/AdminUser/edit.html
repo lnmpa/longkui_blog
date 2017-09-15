@@ -1,0 +1,273 @@
+<admintpl file="header" />
+</head>
+<body>
+	<div class="wrap js-check-wrap">
+		<ul class="nav nav-tabs">
+			<li><a href="{:U('index',array('org_id'=>$org_id))}">用户列表</a></li>
+			<li class="active"><a href="javascript:;">用户{$meta_title}</a></li>
+		</ul>
+		<form action="{:U(ACTION_NAME)}" method="post" class="js-ajax-forms" enctype="multipart/form-data">
+		<div class="tabbable tabs-left">
+			<div class="tabs-left">
+				<ul class="nav nav-pills nav-stacked">
+			        <li class="active"><a href="#A" data-toggle="tab">基本信息</a></li>
+					<li><a href="#B" data-toggle="tab">扩展信息</a></li>
+					<li><a href="#C" data-toggle="tab">状态信息</a></li>
+			    </ul>
+			</div>
+			<div class="tab-content">
+				<div class="tab-pane active" id="A">
+					<fieldset>
+						<div class="form-group">
+						    <label><span class="form-required">*</span>身份证（登陆帐号）</label>
+						    <input type="text" class="form-control" name="user_login" id="user_login" required value="{$data['user_login']}"/>
+							
+						</div>
+						<div class="form-group">
+						    <label><span class="form-required">*</span>姓名</label>
+						    <input type="text" class="form-control" name="user_nicename" id="user_nicename" required value="{$data['user_nicename']}"/>
+						</div>
+						<div class="form-group">
+						    <label>所在组织</label>
+							<taxonomystpl id="org_id" name="org_id" value="$data['org_id']" data="$org_list"/>
+						</div>
+						<!--<div class="form-group">
+						    <label>所在组织</label>
+						    <table class="region table table-bordered">
+		                      <volist name="region_list" id="vo">
+			                  <tr>
+			                    <td>
+			                      <select name="path[]" class="region_select">
+			                      	<option value="0">==请选择==</option>
+									<volist name="vo['_list']" id="val">
+										<option value="{$val.id}" {$val.selected}>{$val.name}</option>
+									</volist>
+			                      </select>
+			                    </td>
+			                  </tr>
+							  </volist>
+			                </table>
+							<input type="hidden" name="org_id" id="org_id" value="{$data['org_id']}"/>
+						</div>-->
+						<div class="form-group">
+						    <label>性别</label>
+							<div>
+							    <label class="radio-inline js-icheck"><input type="radio" name="sex" value="1" <if condition="$data['sex'] eq '1'">checked</if>>男</label>
+								<label class="radio-inline js-icheck"><input type="radio" name="sex" value="2" <if condition="$data['sex'] eq '2'">checked</if>>女</label>
+							</div>
+						</div>
+						<div class="form-group">
+						    <label>生日</label>
+							<input class="form-control js-date" type="text" name="birthday" value="<if condition="$data['birthday'] eq null">{:date('Y-m-d',time())}<else/>{$data['birthday']}</if>">
+						</div>
+						<div class="form-group">
+						    <label>手机号</label>
+							<input class="form-control" type="text" name="mobile" value="{$data['mobile']}">
+						</div>
+					</fieldset>
+				</div>
+				<div class="tab-pane" id="B">
+					<fieldset>
+						<div class="form-group">
+						    <label>身份证</label>
+							<input class="form-control" type="text" name="idcard" id="idcard" value="{$data['idcard']}"/>
+						</div>
+						<div class="form-group">
+						    <label>地址</label>
+							<input class="form-control" type="text" name="address" id="address" value="{$data['address']}"/>
+						</div>
+						<div class="form-group">
+						    <label>民族</label>
+							<selecttpl name="nation" id="nation" value="$data['nation']" class="form-control" type="nation"/>
+						</div>
+						<div class="form-group">
+						    <label>籍贯</label>
+							<input class="form-control" type="text" name="origin" id="origin" value="{$data['origin']}"/>
+						</div>
+						<!--<div class="form-group">
+						    <label>入党时间</label>
+							<input class="form-control js-date" type="text" name="join_time" id="join_time" value="{$data['join_time']}"/>
+						</div>
+						<div class="form-group">
+						    <label>转正时间</label>
+							<input class="form-control js-date" type="text" name="become_time" id="become_time" value="{$data['become_time']}"/>
+						</div>-->
+						<div class="form-group">
+						    <label>工作单位</label>
+							<input class="form-control" type="text" name="work_address" id="work_address" value="{$data['work_address']}"/>
+						</div>
+						<div class="form-group">
+						    <label>档案情况</label>
+							<input class="form-control" type="text" name="record" id="record" value="{$data['record']}"/>
+						</div>
+						<div class="form-group">
+						    <label>备注</label>
+							<textarea class="form-control" name="remark" id="remark">{$data['remark']}</textarea>
+						</div>
+						<div class="form-group">
+						    <label>个人详情</label>
+							<ueditortpl name="info" id="info" value="$data['info']"/>
+						</div>
+					</fieldset>
+				</div>
+				<div class="tab-pane" id="C">
+					<fieldset>
+						<div class="form-group">
+							<label>审核状态</label>
+							<div>
+								<label class="radio-inline js-icheck"><input type="radio" name="status" value="1" <if condition="$data['status'] eq 1">checked</if>>审核通过</label>
+								<label class="radio-inline js-icheck"><input type="radio" name="status" value="0" <if condition="$data['status'] neq 1">checked</if>>待审核</label>
+							</div>
+						</div>
+						<div class="form-group">
+							<label>添加时间</label>
+							<input type="text" class="form-control js-datetime" name="add_time" value="<if condition="$data['add_time'] eq null">{:date('Y-m-d H:i:s',time())}<else/>{$data['add_time']}</if>">
+						</div>
+					</fieldset>
+				</div>
+			</div>
+			<div class="form-actions">
+				<if condition="ACTION_NAME eq 'edit'">
+					<input type="hidden" name="id" value="{$data['id']}"/>
+				</if>
+				<button class="btn btn-primary js-ajax-submit" type="submit">提交</button>
+				<a class="btn btn-default" href="javascript:history.back(-1);">返回</a>
+			</div>
+		</div>
+		</form>
+	</div>
+	<script type="text/javascript" src="__PUBLIC__/js/common.js"></script>
+	<script type="text/javascript">
+		$(function() {
+			$(".region").on("change",".region_select",function(){
+				$obj = $(this).parent().parent();
+				$obj.nextAll().remove();
+				var id = $(this).val();
+				var model = "Common/Organization";
+				var href = "{:U('Asset/Region/get_region')}";
+				if(id != 0){
+					$("#org_id").val(id);
+					$.post(href,{id:id,model:model},function(data){
+						if(data.status == 1){
+							$obj.after(data.info);
+						}
+						else{
+							//console.log(data.info);
+						}
+					})
+				}
+				
+			})
+			
+			Wind.use('validate', 'ajaxForm', 'artDialog', function() {
+				
+				var form = $('form.js-ajax-forms');
+				
+				//ie处理placeholder提交问题
+				if ($.browser && $.browser.msie) {
+					form.find('[placeholder]').each(function() {
+						var input = $(this);
+						if (input.val() == input.attr('placeholder')) {
+							input.val('');
+						}
+					});
+				}
+				
+				var formloading = false;
+				//表单验证开始
+				form.validate({
+					//是否在获取焦点时验证
+					onfocusout : true,
+					//是否在敲击键盘时验证
+					onkeyup : false,
+					//当鼠标掉级时验证
+					onclick : false,
+					//验证错误
+					showErrors : function(errorMap, errorArr) {
+						//errorMap {'name':'错误信息'}
+						//errorArr [{'message':'错误信息',element:({})}]
+						try {
+							$(errorArr[0].element).focus();
+							art.dialog({
+								id : 'error',
+								icon : 'error',
+								lock : true,
+								fixed : true,
+								background : "#CCCCCC",
+								opacity : 0,
+								content : errorArr[0].message,
+								cancelVal : '确定',
+								cancel : function() {
+									$(errorArr[0].element).focus();
+								}
+							});
+						} catch (err) {
+						}
+					},
+					//验证规则
+					rules : {
+						'user_login' : "required",
+						'user_nicename' : "required",
+					},
+					//验证未通过提示消息
+					messages : {
+						'user_login' : '请输入身份证!',
+						'user_nicename' : '请输入姓名!',
+					},
+					//给未通过验证的元素加效果,闪烁等
+					highlight : false,
+					//是否在获取焦点时验证
+					onfocusout : false,
+					//验证通过，提交表单
+					submitHandler : function(forms) {
+						if (formloading)
+							return;
+						$(forms).ajaxSubmit({
+							url : form.attr('action'), //按钮上是否自定义提交地址(多按钮情况)
+							dataType : 'json',
+							beforeSubmit : function(arr, $form, options) {
+								formloading = true;
+							},
+							success : function(data, statusText, xhr, $form) {
+								formloading = false;
+								console.log(data.info);
+								if (data.status) {
+									setCookie("refersh_time", 1);
+									//修改成功
+									Wind.use("artDialog", function() {
+										art.dialog({
+											id : "succeed",
+											icon : "succeed",
+											fixed : true,
+											lock : true,
+											background : "#CCCCCC",
+											opacity : 0,
+											content : data.info,
+											button : [ {
+												name : '继续{$meta_title}？',
+												callback : function() {
+													reloadPage(window);
+													return true;
+												},
+												focus : true
+											}, {
+												name : '返回列表页',
+												callback : function() {
+													location = "{:U('index',array('cate_id'=>$cate_id))}";
+													return true;
+												}
+											} ]
+										});
+									});
+								} else {
+									artdialog_alert(data.info);
+								}
+							}
+						});
+					}
+				});
+			});
+		});
+	</script>
+</body>
+</html>

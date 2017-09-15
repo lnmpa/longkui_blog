@@ -1,0 +1,50 @@
+<admintpl file="header" />
+<link rel="stylesheet" href="__PUBLIC__/js/zTree/css/metroStyle/metroStyle.css" type="text/css">
+<script src="__PUBLIC__/js/zTree/js/jquery.ztree.core.js"></script>
+<!--<script type="text/javascript" src="__PUBLIC__/js/zTree/js/jquery.ztree.excheck.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/zTree/js/jquery.ztree.exedit.js"></script>-->
+</script>
+<style>
+.main-iframe{min-height: 100%;padding: 0;margin-top: 0;margin-right: 0;margin-left: 220px;}
+.cate-iframe{position:absolute;top:0;left:0;overflow:auto;width:220px;height: 100%;}
+</style>
+<script>
+	var setting = {	};
+
+	var zNodes = {$treeData};
+
+	$(document).ready(function(){
+		$.fn.zTree.init($("#treeDemo"), setting, zNodes);
+	});
+	
+	function changeUrl(url){
+		//$('#content-iframe').attr('src',url);
+	}
+
+</script>
+</head>
+<body>
+<div class="cate-iframe" id="cate-iframe">
+	<ul id="treeDemo" class="ztree" style="border:none;background:none;padding: 10px 10px 0px;"></ul>
+</div>
+<div class="main-iframe">
+	<div class="page-iframe" id="content-iframe">
+		
+		<iframe src="{:U('index')}" name="{:CONTROLLER_NAME}_iframe_content" id="{:CONTROLLER_NAME}_iframe_content" style="width:100%;height: 100%;" frameborder="0"></iframe>
+	</div>
+</div>
+</body>
+<script>
+$(function(){
+	$content=$("#content-iframe");
+	$cate=$("#cate-iframe");
+	var headerheight=4;
+	$content.height($(window).height()-headerheight);
+	$cate.height($(window).height()-headerheight);
+	$(window).resize(function(){
+		$content.height($(window).height()-headerheight);
+		$cate.height($(window).height()-headerheight);
+	});
+})
+</script>
+</html>

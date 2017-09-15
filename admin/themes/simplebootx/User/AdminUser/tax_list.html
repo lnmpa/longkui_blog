@@ -1,0 +1,80 @@
+<admintpl file="header" />
+</head>
+<body>
+	<div class="wrap js-check-wrap">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="javascript:;">党费缴纳列表</a></li>
+		</ul>
+		<form class="well form-inline" method="post" action="">
+			年份：
+			<select class="form-control input-sm" name="year">
+				<for start="2017" end="date('Y')+1" step="1" name="i">
+					<option value="{$i}" <if condition="$year eq $i">selected</if>>{$i}年</option>
+				</for>
+			</select>
+			姓名： 
+			<input class="form-control input-sm" type="text" name="name" style="width: 200px;" value="{$name|default=''}" placeholder="请输入姓名...">
+			身份证： 
+			<input class="form-control input-sm" type="text" name="idcard" style="width: 200px;" value="{$idcard|default=''}" placeholder="请输入身份证...">
+			<input type="submit" class="btn btn-primary" value="搜索" />
+		</form>
+		<form class="js-ajax-form" action="" method="post">
+			<table class="table table-hover table-bordered table-list">
+				<thead>
+					<tr>
+						<th width="15" rowspan="2">
+							<label><input type="checkbox" class="js-check-all" data-direction="x" data-checklist="js-check-x"></label>
+						</th>
+						<th width="30" rowspan="2">ID</th>
+						<th width="100" rowspan="2">身份证</th>
+						<th width="100" rowspan="2">党员姓名</th>
+						<th colspan="12">缴纳党费数额（元）</th>
+						<th width="50" rowspan="2">合计</th>
+						<th width="70" rowspan="2">操作</th>
+					</tr>
+					<tr>
+						<th>1月</th>
+						<th>2月</th>
+						<th>3月</th>
+						<th>4月</th>
+						<th>5月</th>
+						<th>6月</th>
+						<th>7月</th>
+						<th>8月</th>
+						<th>9月</th>
+						<th>10月</th>
+						<th>11月</th>
+						<th>12月</th>
+					</tr>
+				</thead>
+				<foreach name="list" item="vo">
+				<tr data-id="{$vo.id}">
+					<td><input type="checkbox" class="js-check" data-yid="js-check-y" data-xid="js-check-x" name="ids[]" value="{$vo.id}" title="ID:{$vo.id}"></td>
+                    <td><b>{$vo.id}</b></td>
+					<td>{$vo.user_login}</td>
+					<td>{$vo.user_nicename}</td>
+					<td>{$vo['tax'][1]}</td>
+					<td>{$vo['tax'][2]}</td>
+					<td>{$vo['tax'][3]}</td>
+					<td>{$vo['tax'][4]}</td>
+					<td>{$vo['tax'][5]}</td>
+					<td>{$vo['tax'][6]}</td>
+					<td>{$vo['tax'][7]}</td>
+					<td>{$vo['tax'][8]}</td>
+					<td>{$vo['tax'][9]}</td>
+					<td>{$vo['tax'][10]}</td>
+					<td>{$vo['tax'][11]}</td>
+					<td>{$vo['tax'][12]}</td>
+					<td>{$vo['tax_count']}</td>
+					<td>
+						<a href="{:U('tax_show',array('uid'=>$vo['id']))}">详细</a>
+					</td>
+				</tr>
+				</foreach>
+			</table>
+			<div class="pagination">{$page}</div>
+		</form>
+	</div>
+	<script src="__PUBLIC__/js/common.js"></script>
+</body>
+</html>

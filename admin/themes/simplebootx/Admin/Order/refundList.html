@@ -1,0 +1,260 @@
+<admintpl file="header" />
+</head>
+<body>
+	<div class="wrap js-check-wrap">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="javascript:;">退货列表</a></li>
+		</ul>
+		<form class="well form-inline" method="post" action="{:U('')}">
+			订单编号： 
+			<input class="form-control input-sm" type="text" name="order_sn" style="width: 200px;" value="{$order_sn|default=''}" placeholder="请输入订单编号...">
+			下单时间：
+			<input type="text" name="start_time" class="form-control input-sm js-datetime" value="{$start_time|default=''}" style="width: 120px;" autocomplete="off" placeholder="请输入开始时间...">-
+			<input type="text" name="end_time" class="form-control input-sm js-datetime" value="{$end_time|default=''}" style="width: 120px;" autocomplete="off" placeholder="请输入结束时间...">
+			<input type="submit" class="btn btn-primary" value="搜索" />
+		</form>
+		<form class="js-ajax-form" action="" method="post">
+			<div class="table-actions">
+				<button class="btn btn-danger btn-small js-ajax-submit" type="submit" data-action="{:U('delete')}" data-subcheck="true" data-msg="您确定删除吗？">删除</button>
+			</div>
+			<table class="table table-hover table-bordered table-list">
+				<thead>
+					<tr>
+						<th width="15">
+							<label><input type="checkbox" class="js-check-all" data-direction="x" data-checklist="js-check-x"></label>
+						</th>
+						<th width="170">商品名称</th>
+						<th width="100">单价*数量=总价</th>
+						<th width="80">下单帐号</th>
+						<th width="50">联系人</th>
+						<th width="80">联系电话</th>
+						<th width="120">下单时间</th>
+						<th width="40">需退款</th>
+						<th width="60">退货说明</th>
+						<th width="40">状态</th>
+						<th width="180">操作</th>
+					</tr>
+				</thead>
+				<foreach name="list" item="vo">
+				<tr data-id="{$vo.id}" data-name="{$vo.order_sn}">
+					<td><input type="checkbox" class="js-check" data-yid="js-check-y" data-xid="js-check-x" name="ids[]" value="{$vo.id}" title="ID:{$vo.id}"></td>
+					<td>
+						<notempty name="vo['img']">
+							<a href="javascript:parent.image_preview_dialog('{:sp_get_image_preview_url($vo['img'])}');">
+								<i class="fa fa-photo fa-fw"></i>
+							</a>
+						</notempty>
+						<a href="{:U('Mall/Product/product_show',array('id'=>$vo['product_id']))}" target="_blank">{$vo['title']}</a>
+					</td>
+					<td>{$vo.one_price}*{$vo.num}={$vo.sum_price}</td>
+			        <td>{$vo.user_name}</td>
+					<td>{$vo.name}</td>
+			        <td>{$vo.mobile}</td>
+					<td>{$vo.create_time}</td>
+					<td><font color="#dd2727">￥{$vo.return_money}</font></td>
+					<td>
+						<a href="javascript:words_dialog('{$vo['remark']}','退货说明');">
+							<i class="fa fa-file-text-o"></i>
+						</a>
+						<notempty name="vo['img1']">
+							<a href="javascript:parent.image_preview_dialog('{:sp_get_image_preview_url($vo['img1'])}');">
+								<i class="fa fa-photo fa-fw"></i>
+							</a>
+						</notempty>
+						<notempty name="vo['img2']">
+							<a href="javascript:parent.image_preview_dialog('{:sp_get_image_preview_url($vo['img2'])}');">
+								<i class="fa fa-photo fa-fw"></i>
+							</a>
+						</notempty>
+						<notempty name="vo['img3']">
+							<a href="javascript:parent.image_preview_dialog('{:sp_get_image_preview_url($vo['img3'])}');">
+								<i class="fa fa-photo fa-fw"></i>
+							</a>
+						</notempty>
+					</td>
+					<td>
+						<if condition="$vo['step_id'] eq 1">
+							等待商家处理
+						<elseif condition="$vo['step_id'] eq 2"/>
+							等待卖家退货
+						<elseif condition="$vo['step_id'] eq 3"/>
+							等待商家收货
+						</if>
+					</td>
+					<td>
+						<if condition="$vo['step_id'] eq 1">
+							<a href="{:U('agreeRefundGoods?id='.$vo['id'])}" class="js-ajax-confirm" data-msg="买家将可以填写退货物流，是否同意退货">同意退货</a>
+							<a href="{:U('rejectRefund')}" data-rid="{$vo['refund_id']}" class="rejectRefund">拒绝退货</a>
+						<elseif condition="$vo['step_id'] eq 3"/>
+							<a href="{:U('agreeRefundMoney?id='.$vo['id'])}" class="refundMoney" data-msg="确认收货后款项将按支付方式原路退还给买家，请务必确认无误！">确认收货</a>
+							<a href="javascript:;" class="refundExpress" data-name="{$vo.express}" data-sn="{$vo.express_sn}">查看物流</a>
+						</if>
+						<a href="{:U('showOrder?id='.$vo['order_id'])}" class="showOrder">查看所属订单</a>
+					</td>
+				</tr>
+				</foreach>
+			</table>
+			<div class="table-actions">
+				<button class="btn btn-danger btn-small js-ajax-submit" type="submit" data-action="{:U('delete')}" data-subcheck="true" data-msg="您确定删除吗？">删除</button>
+			</div>
+			<ul class="pagination">{$page}</ul>
+		</form>
+	</div>
+	<script src="__PUBLIC__/js/common.js"></script>
+	<script>
+		$(".table-list").on("click",".refundExpress",function(){
+			var name = $(this).attr("data-name");
+			var sn = $(this).attr("data-sn");
+			var html = '<table class="table table-bordered">';
+			html += '<tr><th width="120">物流公司:</th><td width="180">'+name+"</td></tr>";
+			html += '<tr><th width="120">物流编号:</th><td width="180">'+sn+"</td></tr>";
+			html += '</table>';
+			words_dialog(html,'退货物流');
+		})
+		$(".table-list").on("click",".refundMoney",function(e){
+            e.preventDefault();
+            var $_this = this,
+                $this = $($_this),
+                href = $this.data('href'),
+                msg = $this.data('msg'),
+				type = $this.data('type'),
+				target = $this.attr('target');
+            href = href ? href : $this.attr('href');
+            art.dialog({
+                title: false,
+                icon: 'question',
+                content: msg ? msg : '确定要删除吗？',
+                follow: $_this,
+                close: function () {
+                    $_this.focus();; //关闭时让触发弹窗的元素获取焦点
+                    return true;
+                },
+                okVal: "确定",
+                ok: function () {
+					top.$loading.show();
+					
+					$.ajax({
+						type:'GEAT',
+						url:href,
+						dataType:'json',
+						async:false,
+						success:function(data){
+							if (data.state === 'success') {
+								if (data.referer) {
+									window.open(data.referer);
+	                            } else {
+	                                art.dialog({
+		                                content: data.info,
+		                                icon: 'succeed',
+										madel:true,
+		                                ok: function () {
+		                                    reloadPage(window);
+		                                    return true;
+		                                }
+		                            });
+	                            }
+	                        } else if (data.state === 'fail') {
+	                            art.dialog({
+	                                content: data.info,
+	                                icon: 'warning',
+	                                ok: function () {
+	                                    this.title(data.info);
+	                                    return true;
+	                                }
+	                            });
+	                        }
+							top.$loading.hide();
+						}
+					})
+                },
+                cancelVal: '关闭',
+                cancel: true
+            });
+        });
+		$(".table-list").on("click",".rejectRefund",function(){
+			var $_this = this;
+			$this = $(this);
+			var id = $this.attr('data-rid');
+			var href = $this.attr("href");
+			var content = '<input style="width:200px;" id="reject_reason" type="text" value="" />';
+			content += '<label class="checkbox"><input id="forbid_apply" type="checkbox" value="1"/>禁止该商品再申请售后</label>';
+			Wind.use("artDialog","iframeTools",function(){
+				art.dialog({
+	                title: "拒绝原因",
+	                icon: 'question',
+	                content: content,
+	                follow: $_this,
+	                close: function () {
+	                    $_this.focus(); //关闭时让触发弹窗的元素获取焦点
+	                    return true;
+	                },
+	                okVal: "确认拒绝退货",
+	                ok: function () {
+						var reject_reason = $("#reject_reason").val();
+						if(reject_reason == '' || reject_reason == null || typeof(reject_reason) == 'undefind'){
+							art.dialog({
+                                content: "请填写拒绝原因",
+                                icon: 'warning',
+                                ok: function () {
+                                    return true;
+                                }
+                            });
+							return false;
+						}
+						var forbid_apply = $("#forbid_apply").attr('checked');
+						var is_forbid = 0;
+						if(forbid_apply == 'checked'){
+							is_forbid = 1;
+						}
+						top.$loading.show();
+	                    $.post(href,{id:id,reject_reason:reject_reason,is_forbid:is_forbid},function(data){
+							if (data.state === 'success') {
+								if (data.referer) {
+	                                location.href = data.referer;
+	                            } else {
+	                                reloadPage(window);
+	                            }
+	                        } else if (data.state === 'fail') {
+	                            art.dialog({
+	                                content: data.info,
+	                                icon: 'warning',
+	                                ok: function () {
+	                                    this.title(data.info);
+	                                    return true;
+	                                }
+	                            });
+	                        }
+							top.$loading.hide();
+						})
+	                },
+	                cancelVal: '取消',
+	                cancel: true
+	            });
+			})
+			return false;
+		})
+		$(".table-list").on("click",".showOrder",function(){
+			$this = $(this);
+			var id = $this.parents('tr').attr('data-id');
+			var name = $this.parents('tr').attr('data-name');
+			var href = $this.attr("href");
+			
+			Wind.use("artDialog","iframeTools",function(){
+		        art.dialog.open(href, {
+			        title: "订单详情:"+name,
+			        id: new Date().getTime(),
+			        width: '800px',
+			        height: '450px',
+			        lock: true,
+			        fixed: true,
+			        background:"#CCCCCC",
+			        opacity:0,
+					cancelVal: '关闭',
+			        cancel: true
+			    });
+		    });
+			return false;
+		})
+	</script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<admintpl file="header" />
+</head>
+<body>
+	<div class="wrapper wrapper-content animated fadeInRight">
+		<div class="row">
+			<volist name="commend_menus" id="val" offset="0" length="4">
+            <div class="col-sm-3">
+            	<php>$bg_class = $key%4==0?'btn-success':($key%4==1?'btn-info':($key%4==2?'btn-danger':'btn-warning'))</php>
+            	<a href="javascript:top.openapp('{:U($val['app'].'/'.$val['model'].'/'.$val['action'].'?'.$val['data'])}','{$val['id']}{$val['app']}','{$val['name']}',true);" title="{$val['name']}">
+                <div class="widget style1 {$bg_class|default='btn-default'}">
+                    <div class="row">
+                        <div class="col-xs-4">
+                            <i class="fa fa-{$val['icon']|default='list'} fa-5x"></i>
+                        </div>
+                        <div class="col-xs-8 text-right">
+                            <h2 class="font-bold">{$val['name']}</h2>
+                            <span>更多</span>
+                        </div>
+                    </div>
+                </div>
+				</a>
+            </div>
+			</volist>
+        </div>
+		<div class="row">
+			<div class="col-sm-6">
+	        	<div class="panel panel-success">
+			      <div class="panel-heading">
+			        <h3 class="panel-title">未来一周气温变化</h3>
+			      </div>
+			      <div class="panel-body">
+			        <div style="height:300px;">
+						<table id="weather" class="table table-hover">
+							<tr><td>正在加载中...</td></tr>
+						</table>
+					</div>
+			      </div>
+			    </div>
+	        </div>
+            <div class="col-sm-6">
+                <div class="panel panel-primary">
+			      <div class="panel-heading">
+			        <h3 class="panel-title">某地区蒸发量和降水量</h3>
+			      </div>
+			      <div class="panel-body">
+			        <div class="echarts" id="echarts-bar-chart" style="height:300px;">
+			        	
+			        </div>
+			      </div>
+			    </div>
+            </div>
+	    </div>
+	</div>
+	<script src="__PUBLIC__/js/common.js"></script>
+    <script src="__PUBLIC__/js/echarts/echarts.min.js"></script>
+	<script>
+	var t = echarts.init(document.getElementById("echarts-bar-chart")), n = {
+        title: {
+            text: "某蒸发量和降水量"
+        },
+        tooltip: {
+            trigger: "axis"
+        },
+        legend: {
+            data: ["蒸发量", "降水量"]
+        },
+        grid: {
+            x: 30,
+            x2: 40,
+            y2: 24
+        },
+        calculable: !0,
+        xAxis: [{
+            type: "category",
+            data: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"]
+        }],
+        yAxis: [{
+            type: "value"
+        }],
+        series: [{
+            name: "蒸发量",
+            type: "bar",
+            data: [2, 4.9, 7, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20, 6.4, 3.3],
+            markPoint: {
+                data: [{
+                    type: "max",
+                    name: "最大值"
+                }, {
+                    type: "min",
+                    name: "最小值"
+                }]
+            },
+            markLine: {
+                data: [{
+                    type: "average",
+                    name: "平均值"
+                }]
+            }
+        }, {
+            name: "降水量",
+            type: "bar",
+            data: [2.6, 5.9, 9, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6, 2.3],
+            markPoint: {
+                data: [{
+                    name: "年最高",
+                    value: 182.2,
+                    xAxis: 7,
+                    yAxis: 183,
+                    symbolSize: 18
+                }, {
+                    name: "年最低",
+                    value: 2.3,
+                    xAxis: 11,
+                    yAxis: 3
+                }]
+            },
+            markLine: {
+                data: [{
+                    type: "average",
+                    name: "平均值"
+                }]
+            }
+        }]
+    };
+    t.setOption(n), window.onresize = t.resize;
+	</script>
+	<script type="text/javascript">
+		function loadweather(){
+			var $table = $('#weather');
+			var loading = '<thead><tr><th><span class="loding-text">正在加载中</span><span class="loading-process">.</span></th></tr></thead>';
+			$table.html(loading);
+			var weather_interval = window.setInterval(function(){
+				$process = $table.find('.loading-process');
+				$count = $process.text().length;
+				$target = ($count+1) %10;
+				$target_process = [];
+				for(i=0;i<=$target; i++){
+					$target_process.push('.');
+				}
+				$process.text($target_process.join(''));
+			},150);
+			$.ajax({
+					url: '{:U("Main/getList")}',
+					success:function(data){
+	
+						if(data){
+							var html = [];
+							html.push("<thead><tr><th colspan='5'>" + data.data.city + "</th></tr></thead>");
+							for(var i = 0;i < data.data.showday;i++)
+							{
+								html.push("<tbody><tr><td>" + data.data.date[i]+ "</td>");
+								html.push("<td><img src = " + data.data.pictureUrl[i] + "></td>");
+								html.push("<td>" + data.data.temperature[i] + "</td>");
+								html.push("<td>" + data.data.wind[i] +"</td>");
+								html.push("<td>" + data.data.weather[i] + "</td></tr></tbody>");
+							}
+	
+							html = html.join('');
+							$table.html(html);
+						}else{
+							$table.html('<tr><td>'+ data.info +'</td></tr>')
+						}
+					},
+					error:function(XMLHttpRequest, textStatus, errorThrown){
+						$table.html('<tr><td>更新失败</td></tr>')
+					},
+					complete:function(XMLHttpRequest, textStatus){
+						window.clearInterval(weather_interval);
+					}
+				}
+			);
+		}
+		$(function(){
+			loadweather();// 首次加载 自动ajax一次获取内容
+			$('#weather').parents('.bd').prev().find('.wm-refresh').click(function(){
+				loadweather();
+			});
+		})
+	</script>
+</body>
+</html>

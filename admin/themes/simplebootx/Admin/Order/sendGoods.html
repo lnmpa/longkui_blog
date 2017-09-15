@@ -1,0 +1,89 @@
+<admintpl file="header" />
+<style>
+.text,.textarea {
+	padding: 4px;
+	border: 1px solid #eeeeee;
+	background-color: #fff;
+	transition: all .3s linear;
+}
+.text {
+	width: 220px;
+	height: 30px;
+	vertical-align: middle;
+}
+.focus {
+	border: 1px solid #a6e1f3;
+	box-shadow: 0 0 12px #baf7ff;
+}
+/* = 表格（默认有斑马条纹）
+------------------------------------------ */
+.info-table {
+	margin: 10px 0;
+}
+.info-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.info-table caption {
+    height: 30px;
+    line-height: 30px;
+    font-weight: 700;
+}
+.info-table th,
+.info-table td {
+    padding:8px;
+    height: 19px;
+    line-height: 19px;
+    font-weight: 400;
+	border: 1px solid #F3F3F3;
+}
+.info-table th {
+    text-align: center;
+	background-color: #FAFAFA;
+}
+.info-table td {
+	background-color: #FAFAFA;
+}
+.info-table tr {
+	background-color: #FAFAFA;
+}
+.form-horizontal .info-label {
+	width:100%;
+	display: block;
+	line-height: 30px;
+	font-weight: bold;
+}
+</style>
+</head>
+<body>
+<div class="tab-wrap">
+    <div class="tab-content">
+        <form id="form" action="{:U('sendGoods')}" method="post" class="form-horizontal">
+            <div id="tab1" class="tab-pane tab1 in">
+                <div class="info-table table-striped">
+                    <table style="width:100%;margin:auto;">
+						<tr>
+                            <th>
+                                <label class="info-label">物流公司</label>
+                            </th>
+                            <td>
+                                <input type="text" class="text input-98" name="send_express">
+                            </td>
+                        </tr>
+						<tr>
+                            <th>
+                                <label class="info-label">物流编号</label>
+                            </th>
+                            <td>
+                                <input type="text" class="text input-98" name="send_express_sn">
+								<input type="hidden" name="id" value="{$data['id']}">
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

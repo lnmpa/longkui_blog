@@ -1,0 +1,50 @@
+<admintpl file="header" />
+</head>
+<body>
+	<div class="wrap js-check-wrap">
+		<form class="well form-inline" method="post" action="">
+			关键词： 
+			<input type="text" class="form-control" name="keyword" style="width: 200px;" value="{$keyword|default=''}" placeholder="请输入关键字...">
+			<input type="submit" class="btn btn-primary" value="搜索" />
+		</form>
+		<div class="container-fluid">
+			<foreach name="list" item="vo">
+			<div class="col-xs-3">
+				  <a href="{:sp_get_image_url($vo['url'])}" class="thumbnail js-fancybox" style="margin:0;">
+				  	<img src="{:sp_get_image_url($vo['url'])}" class="img-resize"/>
+				  </a>
+				  <p class="text-center" style="margin:0;">{$vo['title']}</p>
+				  <p class="text-center">
+				  	<a href="{:sp_get_image_url($vo['url'])}" class="js-fancybox"><i class="fa fa-eye"></i></a>
+				  	<a href="{:U('delete',array('id'=>$vo['id']))}" class="js-ajax-delete" data-callback="picture_node_remove"><i class="fa fa-trash"></i></a>
+				  </p>
+			</div>
+			</foreach>
+		</div>
+		<div class="pagination">{$page}</div>
+	</div>
+	<script src="__PUBLIC__/js/common.js"></script>
+	<script>
+	$(function(){
+		$("img.img-resize").each(function(){
+			resize_img(this);
+		})
+		$(window).resize(function(){
+			$("img.img-resize").each(function(){
+				resize_img(this);
+			})
+		});
+		function resize_img(obj){
+			var height = $(obj).height();
+			var width = $(obj).width();
+			var rate = 1.618;//width/height
+			$(obj).height($(obj).parents('.thumbnail').width()/rate);
+		}
+	})
+	var picture_node_remove = function($obj){
+		$node = $obj.parents('div.col-xs-3')[0];
+		$node.remove();
+	}
+	</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+@charset "utf-8";
+.img_upload_wrap .add_img {
+    background-color: #fff;
+    border: 1px solid #eaeaea;
+    text-align: center;
+    width: 143px;
+    height: 254px;
+    padding-top: 116px;
+	float:left;
+}
+.img_upload_wrap ul li.wrapper-items {
+    width: 143px;
+    height: 254px;
+    float: left;
+    margin: 0 20px 12px 0;
+    background-color: #fff;
+    border: 1px solid #eaeaea;
+	position:relative;
+}
+.img_upload_wrap ul li img {
+    width: 141px;
+    height: 252px;
+    overflow: hidden;
+}
+.img_upload_wrap ul li.wrapper-items .upload-delete{
+	position:absolute;
+	bottom:0;
+	width: 141px;
+    height: 25px;
+	background-color:#ffffff;
+	text-align:center;
+	line-height:25px;
+	cursor:pointer;
+}
+.img_upload_wrap ul li.wrapper-items .upload-percent{
+	text-align:center;
+}

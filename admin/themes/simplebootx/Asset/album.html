@@ -1,0 +1,71 @@
+<style>
+#{album_id}-ul li td{
+	padding-right:5px;
+}
+</style>
+<script type="text/html" id="{album_id}-item-wrapper">
+	<li id="saved{album_id}{id}" style="margin-bottom: 5px;">
+		<table>
+			<tr>
+				<td>
+					<input id="{album_id}-{id}" type="hidden" name="AlbumSet-{album_label}[]" value="{file_id}"> 
+					<input id="{album_id}-{id}-name" class="form-control input-sm" type="text" value="{name}" style="width:200px;" title="图片名称" onchange="change_image_label(document.getElementById('{album_id}-{id}').value,this.value);">
+				</td>
+				<td>
+					<input type="text" class="form-control input-sm" style="width: 60px;" value="0" onchange="change_image_sort(document.getElementById('{album_id}-{id}').value,this.value);">
+				</td>
+				<td>
+					<a href="{url}" id="{album_id}-{id}-a" class="js-fancybox"><img id="{album_id}-{id}-preview" src="{url}" style="height:36px;width: 36px;"></a>
+				</td>
+				<td>
+					<a href="javascript:upload_one_image('图片上传','#{album_id}-{id}');" class="label label-info">替换</a>
+				</td>
+				<td>
+					<a href="javascript:$('#saved{album_id}{id}').remove();" class="label label-danger">移除</a>
+				</td>
+			</tr>
+		</table>
+	</li>
+</script>
+<ul id="{album_id}-ul" class="list-unstyled">
+	<php>$List{album_md5} = sp_get_album({album_value});</php>
+	<notempty name="List{album_md5}">
+		<foreach name="List{album_md5}" item="vo">
+		<li id="saved{album_id}{$key}" style="margin-bottom: 5px;">
+			<table>
+				<tr>
+					<td>
+						<input id="{album_id}-{$key}" type="hidden" name="AlbumSet-{album_label}[]" value="{$vo['id']}"> 
+						<input id="{album_id}-{$key}-name" class="form-control input-sm" type="text" value="{$vo.title}" style="width: 200px;" title="图片名称" onchange="change_image_label(document.getElementById('{album_id}-{$key}').value,this.value);">
+					</td>
+					<td>
+						<input type="text" class="form-control input-sm" style="width: 60px;" value="{$vo['sort']}" onchange="change_image_sort(document.getElementById('{album_id}-{$key}').value,this.value);">
+					</td>
+					<td>
+						<a href="{:sp_get_image_url($vo['url'])}" id="{album_id}-{$key}-a" class="js-fancybox"><img id="{album_id}-{$key}-preview" src="{:sp_get_image_url($vo['url'])}" style="height:36px;width: 36px;"></a>
+					</td>
+					<td>
+						<a href="javascript:upload_one_image('图片上传','#{album_id}-{$key}');" class="label label-info">替换</a>
+					</td>
+					<td>
+						<a href="javascript:;" class="image_remove_{album_id} label label-danger" data-key="{$key}" data-id="{$vo['id']}">移除</a>
+					</td>
+				</tr>
+			</table>
+		</li>
+		</foreach>
+	</notempty>
+</ul>
+<a class="js-fancybox" style="display:none;"></a>
+<if condition="{album_value} != 0">
+	<input type="hidden" name="AlbumSet-{album_label}[]" value="0"> 
+	<input type="hidden" id="{album_id}" name="{album_name}" value="{{album_value}}">
+</if>
+<script>
+	$(".image_remove_{album_id}").click(function(){
+		var key = $(this).attr("data-key");
+		var id = $(this).attr("data-id");
+		$("#saved{album_id}"+key).remove();
+	})
+</script>
+<a href="javascript:upload_multi_image('图片上传','#{album_id}-ul','{album_id}-item-wrapper');" class="btn btn-default btn-small">选择图片</a>

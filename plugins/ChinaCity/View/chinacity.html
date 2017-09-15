@@ -1,0 +1,55 @@
+<select name="area_ids[]" id="J_province"></select>
+<select name="area_ids[]" id="J_city" style="display:none;"></select>
+<select name="area_ids[]" id="J_district" style="display:none;"></select>
+<select name="area_ids[]" id="J_community" style="display:none;"></select>
+
+<script type="text/javascript">
+$(function(){
+	
+	var pid=<if condition="$param.province neq ''">{$param.province}<else />0</if>;  //默认省份id
+	var cid=<if condition="$param.city neq ''">{$param.city}<else />0</if>;  //默认城市id
+	var did=<if condition="$param.district neq ''">{$param.district}<else />0</if>;  //默认区县市id
+	var coid=<if condition="$param.community neq ''">{$param.community}<else />0</if>;  //默认乡镇id
+	
+	$.post("{:sp_plugin_url('ChinaCity://ChinaCity/getProvince')}", {pid: pid}, function(result){
+		$("#J_province").html(result.data);
+	});
+
+	$.post('{:sp_plugin_url("ChinaCity://ChinaCity/getCity")}', {pid: pid, cid: cid}, function(result){
+		$("#J_city").show().html(result.data);
+	});
+
+	$.post('{:sp_plugin_url("ChinaCity://ChinaCity/getDistrict")}', {cid: cid, did: did}, function(result){
+		$("#J_district").show().html(result.data);
+	});
+
+	$.post('{:sp_plugin_url("ChinaCity://ChinaCity/getCommunity")}', {did: did, coid: coid}, function(result){
+		$("#J_community").show().html(result.data);
+	});
+
+	$('#J_province').change(function(){
+		var pid_g=$(this).children('option:selected').val();
+		$.post('{:sp_plugin_url("ChinaCity://ChinaCity/getCity")}', {pid: pid_g}, function(result){
+			$("#J_city").show().html(result.data);
+			$("#J_district").show().html('<option value="">-区县-</option>');
+			$("#J_community").show().html('<option value="">-乡镇-</option>');
+		});
+	});
+	
+	$('#J_city').change(function(){
+		var cid_g=$(this).children('option:selected').val();
+		$.post('{:sp_plugin_url("ChinaCity://ChinaCity/getDistrict")}', {cid: cid_g}, function(result){
+			$("#J_district").show().html(result.data);
+			$("#J_community").show().html('<option value="">-乡镇-</option>');
+		});
+	});
+
+	$('#J_district').change(function(){
+		var did_g=$(this).children('option:selected').val();
+		$.post('{:sp_plugin_url("ChinaCity://ChinaCity/getCommunity")}', {did: did_g}, function(result){
+			$("#J_community").show().html(result.data);
+		});
+	});
+	
+});
+</script>

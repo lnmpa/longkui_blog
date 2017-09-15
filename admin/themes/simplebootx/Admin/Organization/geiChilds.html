@@ -1,0 +1,15 @@
+<volist name="list" id="val">
+	<tr id="{$val.id}" pId="{$val.pid}" {$val.hasChild}>
+		<td>{$val.id}</td>
+		<td>{$val.name}</td>
+		<td>
+			<input name='sort[{$val.id}]' type='text' size='3' value='{$val.sort}' class='form-control input-sm input-order'>
+		</td>
+		<td style='text-align:center;'><i class='fa {$val.status}'></i></td>
+		<td>
+			<a href="{:U('Organization/add', array('pid' => $val['id']))}">添加下级</a> | 
+			<a href="{:U('Organization/edit', array('id' => $val['id']))}">编辑</a> | 
+			<a href="{:U('Organization/delete', array('id' => $val['id']))}" class="js-ajax-delete" data-type="removeAll">删除</a>
+		</td>
+	</tr>
+</volist>

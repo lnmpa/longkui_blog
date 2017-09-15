@@ -1,0 +1,413 @@
+<div class="good_attr">
+    <if condition="isset($proper)">
+        <volist name="proper" key="k" id="v">
+            <div class="proper">
+            	<span class="btn btn-warning" id="{$key}">{:get_spe($key)}</span>
+                <div class="proper_value">
+                    <volist name="v" id="vv">
+                    	<span class="btn btn-info" id="{$vv}">{:get_spe_son($vv)}</span>
+                    </volist>
+                    <button type="button" class="btn btn-primary add-attr-value">
+                        +
+                    </button>
+                </div>
+            </div>
+        </volist>
+    </if>
+    <button type="button" class="btn btn-primary addattr">添加属性</button>
+</div>
+<table class="zwctable table table-bordered">
+</table>
+<div class="form-actions">
+	<input id="attr_id" type="hidden" name="{$name}" value="{$value|default=0}"/>
+	<a class="btn btn-primary btn-return attr-save" href="javascript:;">保存</a>
+	<a class="btn btn-default" href="javascript:history.back(-1);">返回</a>
+</div>
+<div class="apps-mask">
+    <div class="apps-modal">
+    	<div class="property">
+	        <volist name="property" id="v">
+	            <a class="btn btn-default zwc_check" id="{$v['id']}">{$v['name']}</a>
+	        </volist>
+    	</div>
+		<table>
+			<tr>
+				<td width="170">
+					<input id="pro_name" type="text" name="pro_name" class="form-control input-sm"/>
+				</td>
+				<td width="45" align="right">
+					<button type="button" class="btn btn-primary addpro">
+				        +
+				    </button>
+				</td>
+			</tr>
+		</table>
+    </div>
+</div>
+<style>
+#pro_name{
+	margin:5px;
+}
+.proper {
+    padding: 5px 0;
+}
+
+.proper span,.proper .btn {
+	margin:5px;
+}
+
+.addattr,.zwc_check{
+	margin:5px;
+}
+
+.proper .form-control {
+	display:inline;
+}
+
+
+.apps-mask {
+    display: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.2);
+    color: #4d4c4c;
+}
+
+.apps-mask .apps-modal {
+    position: fixed;
+    display: table;
+    height: 90px;
+    top: 165px;
+    left: 50%;
+    margin-left: -122px;
+    width: 265px;
+    background: #fff;
+    border-radius: 5px;
+    padding: 10px;
+    z-index: 100;
+}
+
+.addattr {
+    clear: both;
+    display: block;
+}
+
+</style>
+<script>
+    $('.good_attr').delegate('.proper>span', 'click', function(){
+		$_this = this;
+		$this = $(this);
+		Wind.use("artDialog", function() {
+			art.dialog({
+                title: false,
+                icon: 'question',
+                content: '是否删除？',
+                follow: $_this,
+                okVal: "确定",
+                ok: function () {
+					$this.parent().remove();
+		            zwc_attr();
+					zwc_attr2();
+                },
+                cancelVal: '取消',
+                cancel: true
+            });
+		});
+    })
+    
+    $('.good_attr').delegate('.proper_value>span', 'click', function(){
+		$_this = this;
+		$this = $(this);
+		Wind.use("artDialog", function() {
+			art.dialog({
+                title: false,
+                icon: 'question',
+                content: '是否删除？',
+                follow: $_this,
+                okVal: "确定",
+                ok: function () {
+					$this.remove();
+		            zwc_attr();
+					zwc_attr2();
+                },
+                cancelVal: '取消',
+                cancel: true
+            });
+		});
+    })
+    
+    $('.addattr').click(function(){
+        $('.zwc_check').show();
+        $('.good_attr').find('.proper').each(function(){
+            var id = $(this).children('span').attr('id');
+            $('.zwc_check[id=' + id + ']').hide();
+        })
+        var index = $('.good_attr').children('.proper').length;
+        if (index == 3) {
+			Wind.use("artDialog", function() {
+				art.dialog({
+					id : "error",
+					icon : "error",
+					fixed : true,
+					lock : true,
+					background : "#CCCCCC",
+					opacity : 0,
+					content : '最多只能添加3个',
+				});
+			});
+            return false;
+        }
+        $('.apps-mask').show();
+        
+    })
+    $('.good_attr').delegate('.add-attr-value', 'click', function(){
+        $(this).before('<input type="text" class="text form-control input-sm ajax-proper_value" style="width:200px;" name="name" value="">');
+    })
+    $('.good_attr').delegate('.ajax-proper_value', 'blur', function(){
+        var _this = $(this);
+        var value = $(this).val();
+        if (!value) {
+            return false;
+        }
+        $.post("{:sp_plugin_url('Goodattr://Goodattr/proper')}", {
+            'value': value
+        }, function(data){
+            _this.after('<span class="btn btn-info" id=' + data.id + '>' + data.value + '</span>');
+            _this.remove();
+            zwc_attr();
+			zwc_attr2();
+            //alert(string);
+            //$.post("{:sp_plugin_url('Goodattr://Goodattr/ajax')}",{data:string},function(data){
+            //$('.zwctable').html(data);
+            //})
+        });
+    })
+    
+    zwc_attr1 = function(){
+        var string = '';
+        $('.good_attr').children('.proper').each(function(){
+            var pid = $(this).children('span').attr('id');
+            $(this).children('.proper_value').children('span').each(function(){
+                var id = $(this).attr('id');
+                string = string + pid + ':' + id + ',';
+            });
+        })
+        return string;
+    }
+    
+    zwc_attr = function(){
+    
+        var proper_pname = [];
+        var attr1 = [];
+        var attr2 = [];
+        var attr3 = [];
+        var pid = [];
+        var proper_name = [];
+        if ($('.good_attr').find('.proper_value').html() == undefined) {
+            $('.zwctable').html('');
+            return false;
+        }
+        
+        $('.good_attr').children('.proper').each(function(a){
+        	
+            pid[a] = $(this).children('span').attr('id');
+            
+            if ($(this).children('.proper_value').children('span').attr('id') == undefined) {
+                return false;
+            };
+            proper_pname[a] = $(this).children('span').html();
+            $(this).children('.proper_value').children('span').each(function(e){
+                var id = $(this).attr('id');
+                proper_name[id] = $(this).html();
+                if (a == 0) {
+                    attr1[e] = id;
+                }
+                else if (a == 1) {
+                    attr2[e] = id;
+                }
+                else if (a == 2) {
+                    attr3[e] = id;
+                }
+            });
+        });
+		console.log(pid);
+        //总数
+        var nums = attr1.length * attr2.length ? attr2.length : 1 * attr3.length ? attr3.length : 1;
+		
+        //所有肯能性
+        var all_id = [];
+        var i = 0;
+        for (var a = 0; a < attr1.length; a++) {
+            if (attr2.length == 0) {
+                all_id[a] = pid[0] + ':' + attr1[a];
+                continue;
+            }
+            for (var b = 0; b < attr2.length; b++) {
+                if (attr3.length == 0) {
+                    all_id[i] = pid[0] + ':' + attr1[a] + '|' + pid[1] + ':' + attr2[b];
+                    i++;
+                    continue;
+                }
+                for (var c = 0; c < attr3.length; c++) {
+                    all_id[i] = pid[0] + ':' + attr1[a] + '|' + pid[1] + ':' + attr2[b] + '|' + pid[2] + ':' + attr3[c];
+                    i++;
+                    continue;
+                }
+            }
+        }
+        console.log(all_id);
+        var head = '<tr>';
+        for (var a = 0; a < proper_pname.length; a++) {
+            head = head + "<th>" + proper_pname[a] + "</th>";
+        }
+        head = head + '<th>价格</th>' +
+        '<th>库存</th>' +
+        '</tr>';
+        
+        var string = head;
+        
+        for (var a = 0; a < all_id.length; a++) {
+            string = string + '<tr>';
+            var rowspan = all_id.length;
+            
+            for (var b = 0; b < proper_pname.length; b++) {
+                if (b == 0) {
+                    rowspan = rowspan / attr1.length;
+                    if (a == 0 || a % (rowspan) == 0) {
+                        string = string + '<td rowspan=' + rowspan + '>' + proper_name[attr1[a / rowspan % attr1.length]] + '</td>';
+                    }
+                }
+                else 
+                    if (b == 1) {
+                        rowspan = rowspan / attr2.length;
+                        
+                        if (a == 0 || a % (rowspan) == 0) {
+                            string = string + '<td rowspan=' + rowspan + '>' + proper_name[attr2[a / rowspan % attr2.length]] + '</td>';
+                        }
+                    }
+                    else 
+                        if (b == 2) {
+                            rowspan = rowspan / attr3.length;
+                            if (a == 0 || a % (rowspan) == 0) {
+                                string = string + '<td rowspan=' + rowspan + '>' + proper_name[attr3[a / rowspan % attr3.length]] + '</td>';
+                            }
+                        }
+                
+            }
+            string = string + '<td><input type="text" class="proper_price form-control input-sm" value="" id="' + all_id[a] + '"></td><td><input  type="text" class="proper_kc form-control input-sm" value="" id="' + all_id[a] + '"></td></tr>';
+        }
+        
+        
+        $('.zwctable').html(string);
+    }
+    
+    zwc_attr();
+    
+	$('.apps-modal').delegate('.zwc_check', 'click', function(){
+        var value = $(this).html();
+        var id = $(this).attr('id');
+        $('.apps-mask').hide();
+        $('.addattr').before('<div class="proper">' +
+        '<span class="btn btn-warning" id="' + id + '">' + value + '</span>' +
+        '<div class="proper_value">' +
+        '<button type="button" class="btn btn-primary add-attr-value">+</button>' +
+        '</div></div>');
+        
+    })
+    
+	/*
+	 * <div class="property">
+	        <volist name="property" id="v">
+	            <a class="btn btn-default zwc_check" id="{$v['id']}">{$v['name']}</a>
+	        </volist>
+    	</div>
+	 */
+	
+	$('.apps-modal').delegate('.addpro', 'click', function(){
+		var name = $("#pro_name").val();
+		if (!name) {
+            return false;
+        }
+		$.post("{:sp_plugin_url('Goodattr://Goodattr/pro_add')}",{name:name},function(data){
+	        $('.property').append('<a class="btn btn-default zwc_check" id="' + data.id + '">' + data.name + '</a>');
+			$("#pro_name").val('');
+		})
+        
+    })
+    
+    $('.attr-save').click(function(){
+        var attr_id = $('#attr_id').val();
+        var string = zwc_attr1();
+        var data = '';
+        var kucun = '';
+        $('.zwctable').find('.proper_price').each(function(){
+            var id = $(this).attr('id');
+            var kc = $(this).parents('tr').find('.proper_kc').val();
+            kc = kc ? kc : 0;
+            var price = $(this).val() ? $(this).val() : 0;
+            data = data + id + '-' + price + '-' + kc + ',';
+        })
+		console.log(data);
+        //$('.zwctable').find('.proper_kc').each(function(){
+        //	var id =  $(this).attr('id');
+        //var price = $(this).val()?$(this).val():0;
+        //kucun = kucun + id+'-'+price+',';
+        //})
+        $.post("{:sp_plugin_url('Goodattr://Goodattr/save_attr')}", {
+            'string': string,
+            'price': data,
+            'attr_id': attr_id
+        }, function(data){
+			if(data.status == 1){
+				Wind.use("artDialog", function() {
+					art.dialog({
+						id : "succeed",
+						icon : "succeed",
+						fixed : true,
+						lock : true,
+						background : "#CCCCCC",
+						opacity : 0,
+						content : data.info,
+						button : [ {
+							name : '确定',
+							callback : function() {
+								window.location.reload();
+								return true;
+							},
+							focus : true
+						}]
+					});
+				});
+			}
+			else{
+				console.log(data.info);
+			}
+            //alert('保存成功!记得要点击下面的保存！！');
+        })
+    })
+    
+    
+    var proper_value_price = '<?php echo $proper_value_price;?>';
+    var proper_value_sku = '<?php echo $proper_value_sku;?>';
+    var proper_value_price_json = $.parseJSON(proper_value_price);
+    var proper_value_sku_json = $.parseJSON(proper_value_sku);
+    //console.log(proper_value_price_json);
+    zwc_attr2 = function(){
+        var id = '';
+        $('.zwctable').find('.proper_price').each(function(){
+            id = $(this).attr('id');
+            $(this).val(proper_value_price_json[id]);
+        })
+        
+        $('.zwctable').find('.proper_kc').each(function(){
+            id = $(this).attr('id');
+            $(this).val(proper_value_sku_json[id]);
+        })
+        
+    }
+    zwc_attr2();
+</script>

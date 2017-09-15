@@ -1,0 +1,45 @@
+<admintpl file="header" />
+</head>
+<body>
+	<div class="wrap js-check-wrap">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="javascript:;">党费缴纳查询</a></li>
+		</ul>
+		<form class="well form-inline" method="post" action="">
+			年份：
+			<select class="form-control input-sm" name="year">
+				<for start="2016" end="date('Y')+1" step="1" name="i">
+					<option value="{$i}" <if condition="$year eq $i">selected</if>>{$i}年</option>
+				</for>
+			</select>
+			<input class="form-control input-sm" type="hidden" name="uid" value="{$uid}"/>
+			<input type="submit" class="btn btn-primary" value="搜索" />
+		</form>
+		<form class="js-ajax-form" action="" method="post">
+			<table class="table table-hover table-bordered table-list">
+				<thead>
+					<tr>
+						<th width="100">身份证</th>
+						<th width="100">党员姓名</th>
+						<th width="120">缴费金额（元）</th>
+						<th width="120">党费缴纳时间</th>
+					</tr>
+				</thead>
+				<foreach name="_list" item="vo">
+				<tr>
+					<td>{$vo.user.user_login}</td>
+					<td>{$vo.user.user_nicename}</td>
+					<td>{$vo['price']}</td>
+					<td>{$vo['date']}</td>
+				</tr>
+				</foreach>
+			</table>
+			<div class="pagination">{$page}</div>
+			<div class="form-actions">
+				<a class="btn btn-default" href="javascript:history.back(-1);">返回</a>
+			</div>
+		</form>
+	</div>
+	<script src="__PUBLIC__/js/common.js"></script>
+</body>
+</html>

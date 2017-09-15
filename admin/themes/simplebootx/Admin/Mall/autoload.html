@@ -1,0 +1,42 @@
+<admintpl file="header" />
+</head>
+<body>
+	<div class="wrap js-check-wrap">
+		<ul class="nav nav-tabs">
+	        <li class="active"><a href="#A" data-toggle="tab">基本信息</a></li>
+	    </ul>
+		<form action="{:U(ACTION_NAME)}" method="post" class="form-horizontal js-ajax-form" enctype="multipart/form-data">
+			<div class="tabbable">
+		        <div class="tab-content">
+		          <div class="tab-pane active" id="A">
+						<fieldset>
+							<table class="table table-bordered">
+								<tr>
+									<th>模版文件</th>
+									<td>
+										<a href="__ROOT__/public/templete/mall.xls" id="file-url">
+											<img id="file-preview" src="__ROOT__/public/js/ueditor/dialogs/attachment/fileTypeImages/icon_xls.gif" style="height:16px;width: 16px;">
+											mall.xls
+										</a>
+									</td>
+								</tr>
+								<tr>
+									<th>Excel文件</th>
+									<td>
+										<filetpl name="file" id="file" value="$file"/>
+									</td>
+								</tr>
+							</table>
+						</fieldset>
+					</div>
+				</div>
+		    </div>
+			<div class="form-actions">
+				<button class="btn btn-primary js-ajax-submit" type="submit">提交</button>
+				<a class="btn btn-default" href="javascript:history.back(-1);">返回</a>
+			</div>
+		</form>
+	</div>
+	<script type="text/javascript" src="__PUBLIC__/js/common.js"></script>
+</body>
+</html>

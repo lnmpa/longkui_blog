@@ -1,0 +1,163 @@
+<admintpl file="header" />
+</head>
+<body>
+    <div class="wrap">
+    	订单内商品:
+		<table class="table table-bordered">
+			<tr>
+		      <td colspan="2">商品</td>
+		      <td>单价</td>
+		      <td>数量</td>
+		      <td>小计</td>
+			  <td>售后情况</td>
+		    </tr>
+			<volist name="list" id="val" >
+		    <tr>
+		        <td width="100">
+                    <a href="{:U('Mall/Product/product_show',array('id'=>$val['product_id']))}" target="_blank">
+                    	<img src="{:sp_get_image_url($val['img'])}" width="100" style="height:133px;"/>
+					</a>
+                </td>
+                <td width="385" valign="top">
+                    <p>
+                    	<a href="{:U('Mall/Product/product_show',array('id'=>$val['product_id']))}" target="_blank">
+                    	<if condition="$val['shouhou'] eq 2">
+                    		<s>{$val['title']}</s>
+						<else/>
+							{$val['title']}
+						</if>
+						</a>
+					</p>
+                    <span>
+                    	{$val['attr_info']}
+                    </span>
+                </td>
+		        <td style="line-height:133px;">¥{$val['one_price']}</td>
+		        <td style="line-height:133px;">{$val['num']}</td>
+		        <td style="line-height:133px;">
+					<if condition="$val['shouhou'] eq 2">
+	            		<s><font color="#dd2727">¥{$val['sum_price']}</font></s>
+					<else/>
+						<font color="#dd2727">¥{$val['sum_price']}</font>
+					</if>
+				</td>
+				<td style="line-height:133px;" width="60">
+					<if condition="$val['shouhou'] eq 1">
+						<font color="#dd2727">售后中</font>
+					<elseif condition="$val['shouhou'] eq 2"/>
+						<font color="green">已退款</font>
+					<elseif condition="$val['shouhou'] eq -1"/>
+						售后关闭
+					</if>
+				</td>
+		    </tr>
+			</volist>
+		</table>
+		订单详情:
+        <table class="table table-bordered">
+            <tr>
+                <th width="120">订单编号</th>
+                <td>
+                    {$data['order_sn']}
+                </td>
+            </tr>
+			<tr>
+                <th>下单帐号</th>
+                <td>
+                    {$data['user_name']}
+                </td>
+            </tr>
+			<tr>
+                <th>发货地区</th>
+                <td>
+                    {:get_area($data['area_ids'])}
+                </td>
+            </tr>
+			<tr>
+                <th>发货地址</th>
+                <td>
+                    {$data['address']}
+                </td>
+            </tr>
+			<tr>
+                <th>订单联系人</th>
+                <td>
+                    {$data['name']}
+                </td>
+            </tr>
+			<tr>
+                <th>订单联系电话</th>
+                <td>
+                    {$data['mobile']}
+                </td>
+            </tr>
+			<tr>
+                <th>邮编</th>
+                <td>
+                    {$data['zip_code']}
+                </td>
+            </tr>
+			<tr>
+                <th>是否需要发票</th>
+                <td>
+                	<if condition="$data['is_invoice'] eq 1">是<else/>否</if>
+                </td>
+            </tr>
+			<tr>
+                <th>发票抬头</th>
+                <td>
+                    {$data['invoice_title']}
+                </td>
+            </tr>
+			<tr>
+                <th>买家留言</th>
+                <td>
+                    {$data['message']}
+                </td>
+            </tr>
+			<tr>
+                <th>下单时间</th>
+                <td>
+                    {$data['create_time']}
+                </td>
+            </tr>
+			<tr>
+                <th>实付金额</th>
+                <td>
+                    {$data['pay_money']}
+                </td>
+            </tr>
+			<tr>
+                <th>支付方式</th>
+                <td>
+                	<if condition="$data['pay_type'] eq 'alipay'">
+                		支付宝
+					<elseif condition="$data['pay_type'] eq 'alipay_mobile'"/>
+						支付宝手机
+					<elseif condition="$data['pay_type'] eq 'wxpay'"/>
+						微信支付
+					<elseif condition="$data['pay_type'] eq 'tenpay'"/>
+						财付通
+					<elseif condition="$data['pay_type'] eq 'ylpay'"/>
+						银联支付
+					</if>
+                </td>
+            </tr>
+			<tr>
+                <th>物流公司</th>
+                <td>
+                    {$data['send_express']}
+                </td>
+            </tr>
+			<tr>
+                <th>物流编号</th>
+                <td>
+                    {$data['send_express_sn']}
+                </td>
+            </tr>
+        </table>
+    </div>
+    <script type="text/javascript" src="__PUBLIC__/js/common.js">
+    </script>
+</body>
+</html>

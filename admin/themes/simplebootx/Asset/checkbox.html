@@ -1,0 +1,9 @@
+<div>
+<php>$checkbox{checkbox_md5} = sp_get_category_arr('{checkbox_type}',{checkbox_value});</php>
+<foreach name="checkbox{checkbox_md5}" item="val">
+	<label class="checkbox-inline js-icheck">
+	<input type="checkbox" name="CheckboxSet-{checkbox_label}[]" value="{$val['id']}" <php>if(in_array($val['id'],explode(',',{checkbox_value}))){echo 'checked';}</php>/>{$val['name']}
+	</label>
+</foreach>
+<input type="hidden" name="CheckboxSet-{checkbox_label}[]" value=""/>
+</div>

@@ -1,0 +1,11 @@
+<div>
+<php>$radio{radio_label} = sp_get_category_arr('{radio_type}',{radio_value});</php>
+<foreach name="radio{radio_label}" item="val">
+	<label class="radio-inline js-icheck">
+	<input type="radio" name="{radio_name}" value="{$val['id']}" <if condition="$val['id'] eq {radio_value}">checked</if>/>{$val['name']}
+	</label>
+</foreach>
+<label class="radio-inline js-icheck">
+<input type="radio" name="{radio_name}" value="0"/><b>取消选择</b>
+</label>
+</div>

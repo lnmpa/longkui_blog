@@ -1,0 +1,225 @@
+<admintpl file="header" />
+<script type="text/ecmascript" src="__PUBLIC__/js/jqgrid/js/i18n/grid.locale-cn.js"></script>
+<script type="text/ecmascript" src="__PUBLIC__/js/jqgrid/js/jquery.jqGrid.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="__PUBLIC__/js/jqgrid/css/ui.jqgrid-bootstrap-ui.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="__PUBLIC__/js/jqgrid/css/ui.jqgrid-bootstrap.css" />
+<script>
+	$.jgrid.defaults.width = $(window).width()-40;
+	$(window).resize(function(){
+		var width = $(window).width()-40;
+		$("#jqGrid").setGridWidth(width);
+	});
+</script>
+</head>
+<body>
+	<div class="wrap js-check-wrap">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="javascript:;">{$cate_info['name']}</a></li>
+		</ul>
+		<form class="well form-inline" method="post" action="">
+			<select class="form-control" name="searchField">
+                <option value="id">ID</option>
+				<volist name="field_list" id="val">
+	                <option value="{$val['name']}" <eq name="searchField" value="$val['name']">selected</eq>>{$val['title']}</option>
+				</volist>
+            </select>
+            <select class="form-control" name="searchOper">
+                <option value="cn" <eq name="searchOper" value="cn">selected</eq>>包含</option>
+                <option value="nc" <eq name="searchOper" value="nc">selected</eq>>不包含</option>
+                <option value="eq" <eq name="searchOper" value="eq">selected</eq>>等于</option>
+                <option value="ne" <eq name="searchOper" value="ne">selected</eq>>不等于</option>
+                <option value="bw" <eq name="searchOper" value="bw">selected</eq>>开头是</option>
+                <option value="ew" <eq name="searchOper" value="ew">selected</eq>>结尾是</option>
+                <option value="in" <eq name="searchOper" value="in">selected</eq>>属于</option>
+                <option value="ni" <eq name="searchOper" value="ni">selected</eq>>不属于</option>
+            </select>
+			<input class="form-control" type="text" name="searchString" style="width: 200px;" value="{$searchString}" >
+			<input type="submit" class="btn btn-primary" value="搜索" />
+		</form>
+		<div class="table-actions">
+			<button class="btn btn-primary btn-small jqGrid-add">添加记录</button>
+			<button class="btn btn-success btn-small jqGrid-edit">编辑</button>
+			<button class="btn btn-danger btn-small jqGrid-delete">删除</button>
+			<button class="btn btn-info btn-small jqGrid-loadin">导入记录</button>
+			<a class="btn btn-warning btn-small" href="{:U('loadout',array('cate_id'=>$cate_id,'searchField'=>$searchField,'searchOper'=>$searchOper,'searchString'=>$searchString))}">导出记录</a>
+		</div>
+		<table id="jqGrid" style=""></table>
+		<div id="jqGridPager"></div>
+		<div class="table-actions">
+			<button class="btn btn-primary btn-small jqGrid-add">添加记录</button>
+			<button class="btn btn-success btn-small jqGrid-edit">编辑</button>
+			<button class="btn btn-danger btn-small jqGrid-delete">删除</button>
+			<button class="btn btn-info btn-small jqGrid-loadin">导入记录</button>
+			<a class="btn btn-warning btn-small" href="{:U('loadout',array('cate_id'=>$cate_id,'searchField'=>$searchField,'searchOper'=>$searchOper,'searchString'=>$searchString))}">导出记录</a>
+		</div>
+	</div>
+	<script src="__PUBLIC__/js/common.js"></script>
+	<script type="text/javascript"> 
+			
+        var jqGrid = $("#jqGrid").jqGrid({
+            url: "{:U('index',array('cate_id'=>$cate_id,'searchField'=>$searchField,'searchOper'=>$searchOper,'searchString'=>$searchString))}",
+            mtype: "GET",
+			styleUI : 'Bootstrap',
+            datatype: "json",
+            colModel: [{$col_model}],
+			viewrecords: true,
+            height: 500,
+            rowNum: 100,
+			shrinkToFit:false,
+            pager: "#jqGridPager"
+        });
+		
+		Wind.use('artDialog', 'iframeTools', function () {
+			
+			$(".jqGrid-add").click(function(){
+				var href = "{:U('add',array('cate_id'=>$cate_id))}";
+				jqGrid_add  = art.dialog.open(href, {
+			        title: "添加记录-{$cate_info['name']}",
+			        id: "jqGrid-add",
+			        width: '750px',
+			        height: '500px',
+			        lock: true,
+			        background:"#CCCCCC",
+			        opacity:0,
+			        ok: function(){
+			            var iframewindow = this.iframe.contentWindow;
+						var form = iframewindow.$(".form-submit");
+						form.submit();
+						top.$loading.show();
+						return false;
+			        },
+			        cancel: true
+			    });
+			})
+			
+			$(".jqGrid-edit").click(function(){
+				var id = $(".jqgrow.success").attr('id');
+				if(typeof(id) == 'undefined' || id =='' || id ==null){
+					art.dialog({
+                        content: "请选择一条记录",
+                        icon: 'warning',
+                        ok: function () {
+                            return true;
+                        }
+                    });
+					return false;
+				}
+				var href = "{:U('edit',array('cate_id'=>$cate_id))}?id="+id;
+				jqGrid_edit  = art.dialog.open(href, {
+			        title: "修改记录-{$cate_info['name']}-ID:"+id,
+			        id: "jqGrid-edit",
+			        width: '750px',
+			        height: '500px',
+			        lock: true,
+			        background:"#CCCCCC",
+			        opacity:0,
+			        ok: function(){
+			            var iframewindow = this.iframe.contentWindow;
+						var form = iframewindow.$(".form-submit");
+						form.submit();
+						top.$loading.show();
+						return false;
+			        },
+			        cancel: true
+			    });
+			})
+			
+			$(".jqGrid-loadin").click(function(){
+				var href = "{:U('loadin',array('cate_id'=>$cate_id))}";
+				jqGrid_loadin  = art.dialog.open(href, {
+			        title: "导入记录-{$cate_info['name']}",
+			        id: "jqGrid-loadin",
+			        width: '500px',
+			        height: '300px',
+			        lock: true,
+			        background:"#CCCCCC",
+			        opacity:0,
+			        ok: function(){
+			            var iframewindow = this.iframe.contentWindow;
+						var form = iframewindow.$(".form-submit");
+						form.submit();
+						top.$loading.show();
+						return false;
+			        },
+			        cancel: true
+			    });
+			})
+			
+			$(".jqGrid-delete").click(function(){
+				var id = $(".jqgrow.success").attr('id');
+				if(typeof(id) == 'undefined' || id =='' || id ==null){
+					art.dialog({
+                        content: "请选择一条记录",
+                        icon: 'warning',
+		        		lock: true,
+						opacity:0,
+                        ok: function () {
+                            return true;
+                        }
+                    });
+					return false;
+				}
+				var href = "{:U('delete',array('cate_id'=>$cate_id))}";
+				var $_this = this;
+				art.dialog({
+                    title: false,
+                    icon: 'question',
+                    content: '确定要删除吗？',
+                    follow: $_this,
+                    close: function () {
+                        $_this.focus(); //关闭时让触发弹窗的元素获取焦点
+                        return true;
+                    },
+                    okVal: "确定",
+                    ok: function () {
+						top.$loading.show();
+                        $.post(href,{id:id},function(data){
+							top.$loading.hide();
+							if(data.status == 0){
+								art.dialog({
+		                            content: data.info,
+		                            icon: 'warning',
+					        		lock: true,
+									opacity:0,
+		                            ok: function () {
+		                                return true;
+		                            }
+		                        });
+							}
+							else if(data.status == 1){
+								$(".jqgrow[id='"+id+"']").remove();
+							}
+						})
+                    },
+                    cancelVal: '关闭',
+                    cancel: true
+                });
+				
+			})
+			
+		})
+		
+		Wind.css('fancybox');
+        Wind.use('fancybox', function () {
+			$(".js-fancybox").fancybox({openEffect:"none",closeEffect:"none"})
+        });
+		
+		var jqGrid_add;
+		function finish_add(data){
+			top.$loading.hide();
+			jqGrid.addRowData(data.id,data);
+			jqGrid_add.close();
+		}
+		var jqGrid_edit;
+ 		function finish_edit(data){
+			top.$loading.hide();
+			jqGrid.setRowData(data.id,data);
+			jqGrid_edit.close();
+		}
+ 		function finish_loadin(){
+			top.$loading.hide();
+			window.location.reload();
+		}
+   </script>
+</body>
+</html>

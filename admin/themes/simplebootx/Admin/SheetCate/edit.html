@@ -1,0 +1,216 @@
+<admintpl file="header" />
+</head>
+<body>
+	<div class="wrap js-check-wrap">
+		<ul class="nav nav-tabs">
+			<li><a href="{:U('index')}">分类列表</a></li>
+			<li class="active"><a href="{:U('add')}">添加分类</a></li>
+			<li><a href="{:U('add_all')}">快速添加</a></li>
+		</ul>
+		<form class="form-horizontal js-ajax-forms" action="{:U(ACTION_NAME)}" method="post" enctype="multipart/form-data">
+			<div class="tabbable">
+				<div class="tabs-left">
+					<ul class="nav nav-pills nav-stacked">
+						<li class="active"><a href="#A" data-toggle="tab">基本信息</a></li>
+		        		<li><a href="#B" data-toggle="tab">扩展信息</a></li>
+		        		<li><a href="#C" data-toggle="tab">SEO设置</a></li>
+					</ul>
+				</div>
+		        <div class="tab-content">
+		          <div class="tab-pane active" id="A">
+						<fieldset>
+							<input class="form-control" type="hidden" name="id" value="{$data['id']}"/>
+							<div class="form-group">
+							    <label>上级分类<span class="form-required">*</span></label>
+							    <select class="form-control" name="pid" id="pid">
+									<option value="0">==请选择==</option>
+									{$select_categorys}
+								</select>
+							</div>
+							<div class="form-group">
+								<label>分类名称<span class="form-required">*</span></label>
+								<input class="form-control" type="text" name="name" value="{$data['name']}">
+							</div>
+							<div class="form-group">
+								<label>分类英文名称<span class="form-required">*</span></label>
+								<input class="form-control" type="text" name="name_en" value="{$data['name_en']}">
+							</div>
+							<div class="form-group">
+								<label>图片（jpg格式：宽1920*高868）</label>
+								<imagetpl name="img" id="img" value="$data['img']"/>
+							</div>
+							<div class="form-group">
+								<label>分类别名</label>
+								<input class="form-control" type="text" name="alias" value="{$data['alias']}">
+							</div>
+							<div class="form-group">
+								<label>后台栏目模板</label>
+								<input class="form-control" type="text" name="alias_template" value="{$data['alias_template']}">
+							</div>
+							<div class="form-group">
+								<label>简述</label>
+								<textarea class="form-control" name="abst" rows="5" cols="57">{$data['abst']}</textarea>
+							</div>
+						</fieldset>
+		          </div>
+		          <div class="tab-pane" id="B">
+						<fieldset>
+							<div class="form-group">
+								<label>详细内容</label>
+								<ueditortpl name="info" id="info" value="$data['info']"/>
+							</div>
+							<div class="form-group">
+								<label>栏目副标题</label>
+								<input class="form-control" type="text" name="sub_title" value="{$data['sub_title']}">
+							</div>
+							<div class="form-group">
+								<label>排序</label>
+								<input class="form-control" type="text" name="sort_order" value="{$data['sort_order']}" class='input input-order'>
+							</div>
+							<div class="form-group">
+								<label>审核</label>
+								<div>
+									<label class="radio-inline js-icheck"><input class="form-control" type="radio" name="status" value="1" <if condition="$data['status'] neq '0'">checked</if>>审核通过</label>
+									<label class="radio-inline js-icheck"><input class="form-control" type="radio" name="status" value="0" <if condition="$data['status'] eq '0'">checked</if>>待审核</label>
+								</div>
+							</div>
+						</fieldset>
+		          </div>
+		          <div class="tab-pane" id="C">
+						<fieldset>
+							<div class="form-group">
+								<label>SEO标题</label>
+								<input class="form-control" type="text" name="seo_title" value="{$data['seo_title']}">
+							</div>
+							<div class="form-group">
+								<label>SEO关键字</label>
+								<input class="form-control" type="text" name="seo_keys" value="{$data['seo_keys']}">
+							</div>
+							<div class="form-group">
+								<label>SEO描述</label>
+								<textarea class="form-control" name="seo_desc" rows="5" cols="57">{$data['seo_desc']}</textarea>
+							</div>
+						</fieldset>
+		          </div>
+		        </div>
+		    </div>
+		    <div class="form-actions">
+		     	<button class="btn btn-primary js-ajax-submit" type="submit">{:L('SAVE')}</button>
+		      	<a class="btn btn-default" href="javascript:history.back(-1);">{:L('BACK')}</a>
+		    </div>
+		</form>
+	</div>
+	<script type="text/javascript" src="__PUBLIC__/js/common.js"></script>
+	<script type="text/javascript">
+		$(function() {
+			Wind.use('validate', 'ajaxForm', 'artDialog', function() {
+				
+				
+				var form = $('form.js-ajax-forms');
+				
+				//ie处理placeholder提交问题
+				if ($.browser && $.browser.msie) {
+					form.find('[placeholder]').each(function() {
+						var input = $(this);
+						if (input.val() == input.attr('placeholder')) {
+							input.val('');
+						}
+					});
+				}
+				
+				var formloading = false;
+				//表单验证开始
+				form.validate({
+					//是否在获取焦点时验证
+					onfocusout : true,
+					//是否在敲击键盘时验证
+					onkeyup : false,
+					//当鼠标掉级时验证
+					onclick : false,
+					//验证错误
+					showErrors : function(errorMap, errorArr) {
+						//errorMap {'name':'错误信息'}
+						//errorArr [{'message':'错误信息',element:({})}]
+						try {
+							$(errorArr[0].element).focus();
+							art.dialog({
+								id : 'error',
+								icon : 'error',
+								lock : true,
+								fixed : true,
+								background : "#CCCCCC",
+								opacity : 0,
+								content : errorArr[0].message,
+								cancelVal : '确定',
+								cancel : function() {
+									$(errorArr[0].element).focus();
+								}
+							});
+						} catch (err) {
+						}
+					},
+					//验证规则
+					rules : {
+						'name' : "required",
+					},
+					//验证未通过提示消息
+					messages : {
+						'name' : '请输入分类名称',
+					},
+					//给未通过验证的元素加效果,闪烁等
+					highlight : false,
+					//是否在获取焦点时验证
+					onfocusout : false,
+					//验证通过，提交表单
+					submitHandler : function(forms) {
+						if (formloading)
+							return;
+						$(forms).ajaxSubmit({
+							url : form.attr('action'), //按钮上是否自定义提交地址(多按钮情况)
+							dataType : 'json',
+							beforeSubmit : function(arr, $form, options) {
+								formloading = true;
+							},
+							success : function(data, statusText, xhr, $form) {
+								formloading = false;
+								console.log(data);
+								if (data.status) {
+									setCookie("refersh_time", 1);
+									//修改成功
+									Wind.use("artDialog", function() {
+										art.dialog({
+											id : "succeed",
+											icon : "succeed",
+											fixed : true,
+											lock : true,
+											background : "#CCCCCC",
+											opacity : 0,
+											content : data.info,
+											button : [ {
+												name : '继续{$meta_title}？',
+												callback : function() {
+													reloadPage(window);
+													return true;
+												},
+												focus : true
+											}, {
+												name : '返回列表页',
+												callback : function() {
+													location = "{:U('index',array('cate_id'=>$cate_id))}";
+													return true;
+												}
+											} ]
+										});
+									});
+								} else {
+									artdialog_alert(data.info);
+								}
+							}
+						});
+					}
+				});
+			});
+		});
+	</script>
+</body>
+</html>

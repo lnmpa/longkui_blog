@@ -1,0 +1,99 @@
+<admintpl file="header" />
+<style>
+.fa{
+	font-size:16px;
+	cursor:pointer;
+}
+.fa-check{
+	color:#7bb33d;
+}
+.fa-close{
+	color:#d41e24;
+}
+</style>
+</head>
+<body>
+	<div class="wrap js-check-wrap">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="{:U('CategoryType/index')}">分类列表</a></li>
+			<li><a href="{:U('CategoryType/add')}">添加分类</a></li>
+		</ul>
+		<form class="js-ajax-form" action="" method="post">
+			<div class="table-actions">
+				<a class="btn btn-primary btn-small" href="javascript:reloadPage(window);">刷新</a>
+			</div>
+			<table class="table table-hover table-bordered table-list" id="menus-table">
+				<thead>
+					<tr>
+						<th width="30" style="text-align:center;"><label><input type="checkbox" class="js-check-all" data-direction="x" data-checklist="js-check-x"></label></th>
+						<th width="30" style="text-align:center;">ID</th>
+						<th>名称</th>
+						<th>标识</th>
+						<th>备注</th>
+						<th width="50" style="text-align:center;">审核</th>
+						<th width="180">操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					<foreach name="list" item="vo">
+					<tr data-id="{$vo.id}">
+						<td style='text-align:center;'><input type='checkbox' class='js-check' data-yid='js-check-y' data-xid='js-check-x' name='ids[]' value='{$vo.id}'></td>
+						<td style="text-align:center;">{$vo.id}</td>
+						<td>{$vo.name}</td>
+						<td>{$vo.label}</td>
+						<td>{$vo.remark}</td>
+						<td style="text-align:center;"><i class='fa {$vo.status}' data-type='status'></i></td>
+						<td>
+							<a href="{:U('CategoryType/edit',array('ids'=>$vo['id']))}">编辑</a>|
+							<a href="{:U('CategoryType/delete',array('ids'=>$vo['id']))}" class="js-ajax-delete">删除</a>
+						</td>
+					</tr>
+					</foreach>
+				</tbody>
+				<tfoot>
+					<tr>
+						<th width="30" style="text-align:center;"><label><input type="checkbox" class="js-check-all" data-direction="x" data-checklist="js-check-x"></label></th>
+						<th width="30">ID</th>
+						<th>名称</th>
+						<th>标识</th>
+						<th>备注</th>
+						<th width="50" style="text-align:center;">审核</th>
+						<th width="180">操作</th>
+					</tr>
+				</tfoot>
+			</table>
+			<div class="table-actions">
+				<a class="btn btn-primary btn-small" href="javascript:reloadPage(window);">刷新</a>
+			</div>
+		</form>
+	</div>
+	<script src="__PUBLIC__/js/common.js"></script>
+	<script>
+		$(".table-list").on("click",".fa-check",function(){
+			var obj = $(this);
+			var id = obj.parents('tr').attr("data-id");
+			var type = "status";
+			console.log(id);
+			parent.$loading.show();
+			$.post("{:U('status')}",{id:id,value:0,type:type},function(data){
+				console.log(data);
+				obj.removeClass("fa-check");
+				obj.addClass("fa-close");
+				parent.$loading.hide();
+			})
+		})
+		
+		$(".table-list").on("click",".fa-close",function(){
+			var obj = $(this);
+			var id = obj.parents('tr').attr("data-id");
+			var type = "status";
+			parent.$loading.show();
+			$.post("{:U('status')}",{id:id,value:1,type:type},function(data){
+				obj.removeClass("fa-close");
+				obj.addClass("fa-check");
+				parent.$loading.hide();
+			})
+		})
+	</script>
+</body>
+</html>

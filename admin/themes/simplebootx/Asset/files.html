@@ -1,0 +1,38 @@
+<table border="0">
+	<tr>
+		<td width="20">
+			<a class="pull-left" href="<if condition="{files_value} != 0">{:u('Asset/Asset/downloadFile',array('id'=>{files_value}))}<else/>javascript:;</if>" id="{files_id}-url">
+				<img id="{files_id}-preview" src="{:sp_get_file_icon({files_value})}" style="height:16px;width: 16px;">
+			</a>
+			<input id="{files_id}-label" type="hidden" name="FilesSet-{files_label}" value="{{files_value}}">
+			<input id="{files_id}" type="hidden" name="{files_name}" value="{{files_value}}">
+		</td>
+		<td width="205">
+			<input class="form-control input-sm pull-left" style="width:200px;" type="text" id="{files_id}-name" value="{:sp_get_file_field({files_value},'title')}" disabled="disabled">
+		</td>
+		<td>
+			<input type="button" class="btn btn-default btn-small pull-left" id="{files_id}-upload" value="<if condition="sp_get_file_field({files_value},'title') != null">删除附件<else/>上传附件</if>">
+		</td>
+	</tr>
+</table>
+<script>
+$("#{files_id}-upload").click(function(){
+	var id = $("#{files_id}").val();
+	var name = $("#{files_id}-name").val();
+	if(name != null && name != '' && typeof(name)!= 'undefind'){
+		$.post("{:U('Asset/asset/delete_file')}",{id:id},function(data){
+			$('#{files_id}-preview').attr('src','{:sp_get_file_icon()}');
+			$('#{files_id}-url').attr('href','javascript:;');
+			$('#{files_id}-name').val('');
+			$('#{files_id}-label').val(0);
+			$('#{files_id}').val(0);
+			$("#{files_id}-upload").val('上传附件');
+		})
+	}
+	else{
+		upload_one_file('附件上传','#{files_id}','','','{files_type}');
+	}
+	
+	return false;
+})
+</script>

@@ -1,0 +1,39 @@
+<admintpl file="header" />
+</head>
+<body>
+	<div class="wrap">
+		<ul class="nav nav-tabs">
+			<li><a href="{:U('CategoryType/index')}">分类列表</a></li>
+			<li class="active"><a href="{:U('CategoryType/add')}">分类添加</a></li>
+		</ul>
+		<form method="post" class="form-horizontal js-ajax-form" action="{:U(ACTION_NAME)}">
+			<fieldset>
+				<div class="form-group">
+					<label class="col-sm-2 control-label"><span class="form-required">*</span>分类名称</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="text" name="name" value="{$data.name}">
+						<input type="hidden" name="id" value="{$data.id}">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label"><span class="form-required">*</span>分类标识</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="text" name="label" value="{$data.label}">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">备注</label>
+					<div class="col-sm-10">
+						<textarea class="form-control" name="remark" rows="5" cols="57">{$data.remark}</textarea>
+					</div>
+				</div>
+			</fieldset>
+			<div class="form-actions">
+				<button class="btn btn-primary js-ajax-submit" type="submit">保存</button>
+				<a class="btn btn-default" href="javascript:history.back(-1);">返回</a>
+			</div>
+		</form>
+	</div>
+	<script src="__PUBLIC__/js/common.js"></script>
+</body>
+</html>

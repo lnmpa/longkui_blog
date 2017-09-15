@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<HTML>
+<HEAD>
+	<TITLE> ZTREE DEMO - Standard Data </TITLE>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="__PUBLIC__/js/zTree/css/metroStyle/metroStyle.css" type="text/css">
+	<script src="__PUBLIC__/js/jquery.js"></script>
+	<script src="__PUBLIC__/js/zTree/js/jquery.ztree.core-3.5.js"></script>
+	<!--  <script type="text/javascript" src="js/jquery.ztree.excheck-3.5.js"></script>
+	  <script type="text/javascript" src="js/jquery.ztree.exedit-3.5.js"></script>-->
+	<SCRIPT type="text/javascript">
+		<!--
+		
+		var setting = {
+			async: {
+				enable: true,
+				url:"{:U('User/AdminUser/ajaxGetOrgMenu')}",
+				autoParam:["id", "name=n", "level=lv"],
+				otherParam:{"otherParam":"zTreeAsyncTest"},
+				dataFilter: filter
+			}
+		};
+
+		function filter(treeId, parentNode, childNodes) {
+			if (!childNodes) return null;
+			for (var i=0, l=childNodes.length; i<l; i++) {
+				childNodes[i].name = childNodes[i].name.replace(/\.n/g, '.');
+			}
+			return childNodes;
+		}
+
+		$(document).ready(function(){
+			$.fn.zTree.init($("#treeDemo"), setting);
+		});
+		//-->
+	</SCRIPT>
+</HEAD>
+
+<BODY style="background:none">
+
+ 
+	<div  >
+		<ul id="treeDemo" class="ztree" style="border:none;background:none;"></ul>
+	</div> 
+ 
+</BODY>
+</HTML>

@@ -1,0 +1,93 @@
+<admintpl file="header" />
+</head>
+<body>
+	<div class="wrap js-check-wrap">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="javascropt:;">{:L('ADMIN_NAV_INDEX')}</a></li>
+			<li><a href="{:U('nav/add',array('cid'=>$navcid))}">{:L('ADMIN_NAV_ADD')}</a></li>
+			<li><a href="{:U('nav/add_all',array('cid'=>$navcid))}">快速添加</a></li>
+		</ul>
+
+		<form class="well form-inline" id="mainform" action="{:U('nav/index')}" method="post">
+			<select class="form-control input-sm" id="navcid_select" name="cid">
+				<foreach name="navcats" item="vo"> <php>$navcid_selected=$navcid==$vo['navcid']?"selected":"";</php>
+				<option value="{$vo.navcid}"{$navcid_selected}>{$vo.name}</option>
+				</foreach>
+			</select>
+		</form>
+		<form class="js-ajax-form" action="{:U('nav/listorders')}" method="post">
+			<div class="table-actions">
+			</div>
+			<table class="table table-hover table-bordered table-list">
+				<thead>
+					<tr>
+						<th width="50">{:L('SORT')}</th>
+						<th width="50">ID</th>
+						<th>{:L('NAVIGATION_NAME')}</th>
+						<th width="80">{:L('STATUS')}</th>
+						<th width="180">{:L('ACTIONS')}</th>
+					</tr>
+				</thead>
+				<tbody>
+				{$categorys}
+				</tbody>
+				<tfoot>
+					<tr>
+						<th width="50">{:L('SORT')}</th>
+						<th width="50">ID</th>
+						<th>{:L('NAVIGATION_NAME')}</th>
+						<th width="80">{:L('STATUS')}</th>
+						<th width="180">{:L('ACTIONS')}</th>
+					</tr>
+				</tfoot>
+			</table>
+			<div class="table-actions">
+			</div>
+		</form>
+	</div>
+	<script src="__PUBLIC__/js/common.js"></script>
+	<script>
+		$(function() {
+
+			$("#navcid_select").change(function() {
+				$("#mainform").submit();
+			});
+
+		});
+		$(".table-list").on("change",".input-ajax",function(){
+			var id = $(this).parents('tr').attr("data-id");
+			var value = $(this).val();
+			var type = "listorder";
+			top.$loading.show();
+			if(id != null && value != null){
+				$.post("{:U('status')}",{ids:id,value:value,type:type},function(data){
+					top.$loading.hide();
+				})
+			}
+		})
+		$(".table-list").on("click",".fa-check",function(){
+			var obj = $(this);
+			var id = obj.parents('tr').attr("data-id");
+			var type = obj.attr("data-type");
+			top.$loading.show();
+			$.post("{:U('status')}",{ids:id,value:0,type:type},function(data){
+				obj.removeClass("fa-check");
+				obj.addClass("fa-close");
+				top.$loading.hide();
+			})
+		})
+		
+		$(".table-list").on("click",".fa-close",function(){
+			var obj = $(this);
+			var id = obj.parents('tr').attr("data-id");
+			var type = obj.attr("data-type");
+			top.$loading.show();
+			$.post("{:U('status')}",{ids:id,value:1,type:type},function(data){
+				obj.removeClass("fa-close");
+				obj.addClass("fa-check");
+				top.$loading.hide();
+			})
+		})
+	</script>
+</body>
+</html>

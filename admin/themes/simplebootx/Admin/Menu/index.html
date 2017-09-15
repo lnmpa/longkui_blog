@@ -1,0 +1,190 @@
+<admintpl file="header" />
+</head>
+<body>
+	<div class="wrap js-check-wrap">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="{:U('menu/index')}">{:L('ADMIN_MENU_INDEX')}</a></li>
+			<li><a href="{:U('menu/add')}">{:L('ADMIN_MENU_ADD')}</a></li>
+			<!--<li><a href="{:U('menu/lists')}">{:L('ADMIN_MENU_LISTS')}</a></li>-->
+		</ul>
+		<form class="js-ajax-form" action="{:U('Menu/listorders')}" method="post">
+			<div class="table-actions">
+				<a class="btn btn-warning btn-small" href="{:U('menu/getactions')}">导入新菜单</a>
+			</div>
+			<table class="table table-hover table-bordered table-list" id="menus-table">
+				<thead>
+					<tr>
+						<th width="80">{:L('SORT')}</th>
+						<th width="50">ID</th>
+						<th>{:L('APP')}</th>
+						<th>{:L('NAME')}</th>
+						<th width="80">{:L('STATUS')}</th>
+						<th width="80">是否菜单</th>
+						<th width="80">顶部显示</th>
+						<th width="180">{:L('ACTIONS')}</th>
+					</tr>
+				</thead>
+				<tbody>
+					{$categorys}
+				</tbody>
+				<tfoot>
+					<tr>
+						<th width="80">{:L('SORT')}</th>
+						<th width="50">ID</th>
+						<th>{:L('APP')}</th>
+						<th>{:L('NAME')}</th>
+						<th width="80">{:L('STATUS')}</th>
+						<th width="80">是否菜单</th>
+						<th width="80">顶部显示</th>
+						<th width="180">{:L('ACTIONS')}</th>
+					</tr>
+				</tfoot>
+			</table>
+			<div class="table-actions">
+			</div>
+		</form>
+	</div>
+	<script src="__PUBLIC__/js/common.js"></script>
+	<script>
+		$(document).ready(function() {
+			Wind.css('treeTable');
+			Wind.use('treeTable', function() {
+				$("#menus-table").treeTable({
+					indent : 20
+				});
+			});
+		});
+		$(".table-list").on("change",".input-order",function(){
+			var id = $(this).parents('tr').attr("data-id");
+			var value = $(this).val();
+			var type = "listorder";
+			top.$loading.show();
+			if(id != null && value != null){
+				$.post("{:U('status')}",{ids:id,value:value,type:type},function(data){
+					top.$loading.hide();
+				})
+			}
+		})
+		
+		$(".table-list").on("click",".fa-check",function(){
+			var obj = $(this);
+			var id = obj.parents('tr').attr("data-id");
+			var type = obj.attr("data-type");
+			top.$loading.show();
+			$.post("{:U('status')}",{ids:id,value:0,type:type},function(data){
+				obj.removeClass("fa-check");
+				obj.addClass("fa-close");
+				top.$loading.hide();
+			})
+		})
+		
+		$(".table-list").on("click",".fa-close",function(){
+			var obj = $(this);
+			var id = obj.parents('tr').attr("data-id");
+			var type = obj.attr("data-type");
+			top.$loading.show();
+			$.post("{:U('status')}",{ids:id,value:1,type:type},function(data){
+				obj.removeClass("fa-close");
+				obj.addClass("fa-check");
+				top.$loading.hide();
+			})
+		})
+		if ($('a.js-iframe-post').length) {
+		    Wind.use('artDialog', 'iframeTools', function () {
+		        $('.js-iframe-post').on('click', function (e) {
+		            e.preventDefault();
+		            var _this = this,
+		                $_this = $(_this);
+		            var dialog_iframe = art.dialog.open($(this).prop('href'), {
+		                ok: function () {
+							var iframe = this.iframe.contentWindow;
+							$form = iframe.$("form.js-ajax-form");
+							var action = $form.attr('action');
+							var query = $form.serialize();
+							var fields = $form.serializeArray();
+							var params = new Object(); 
+							jQuery.each( fields, function(i, field){
+								params[field.name] = field.value;
+							});
+							$.post(action,query,function(data){
+								if (data.referer) {
+		                            //返回带跳转地址
+		                        	window.location.href = data.referer;
+		                        } else {
+		                        	if (data.state === 'success') {
+		                                art.dialog({
+	                                        content: data.info,
+											fixed: true,
+								            lock: true,
+								            background: "#CCCCCC",
+								            opacity: 0,
+	                                        icon: 'succeed',
+	                                        ok: function () {
+												var id = params.id;
+												$fffs = $("#node-"+id).find("fff");
+												$($fffs[0]).html(params.app+"/"+params.model+"/"+params.action);
+	                                            $($fffs[1]).html(params.name);
+												if(params.status==0){
+													$("#node-"+id).find("i[data-type='status']").removeClass("fa-check").addClass("fa-close");
+												}
+												else if(params.status==1){
+													$("#node-"+id).find("i[data-type='status']").removeClass("fa-close").addClass("fa-check");
+												}
+												if(params.type==0){
+													$("#node-"+id).find("i[data-type='type']").removeClass("fa-check").addClass("fa-close");
+												}
+												else if(params.type==1){
+													$("#node-"+id).find("i[data-type='type']").removeClass("fa-close").addClass("fa-check");
+												}
+												dialog_iframe.close();
+	                                            return true;
+	                                        },
+	                                    });
+		                            } else if (data.state === 'fail') {
+		                                art.dialog({
+		                                    content: data.info,
+											fixed: true,
+								            lock: true,
+								            background: "#CCCCCC",
+								            opacity: 0,
+		                                    icon: 'warning',
+		                                    ok: function () {
+		                                        this.title(data.info);
+		                                        return true;
+		                                    }
+		                                });
+		                            }
+		                        }
+							})
+			                return false;
+			            },
+						okVal: "提交",
+						cancel: function () {
+							$_this.focus();
+			                return true;
+			            },
+						cancelVal: "取消",
+				        close: function () {
+				            $_this.focus(); //关闭时让触发弹窗的元素获取焦点
+				            return true;
+				        },
+						width:'900px',
+						height:'400px',
+						fixed: true,
+						lock:true,
+		                title: $_this.prop('title')
+		            });
+		        }).attr('role', 'button');
+		
+		    });
+		}
+		setInterval(function() {
+			var refersh_time = getCookie('refersh_time_admin_menu_index');
+			if (refersh_time == 1) {
+				reloadPage(window);
+			}
+		}, 1000);
+		setCookie('refersh_time_admin_menu_index', 0);
+	</script>
+</body>
+</html>

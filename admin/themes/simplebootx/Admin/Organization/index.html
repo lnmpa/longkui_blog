@@ -1,0 +1,133 @@
+<admintpl file="header" />
+<style>
+.fa{
+	font-size:16px;
+	cursor:pointer;
+}
+.fa-check{
+	color:#7bb33d;
+}
+.fa-close{
+	color:#d41e24;
+}
+</style>
+</head>
+<body>
+	<div class="wrap js-check-wrap">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="{:U('Organization/index')}">组织列表</a></li>
+			<li><a href="{:U('Organization/add')}">添加组织</a></li>
+		</ul>
+		<form class="js-ajax-form" action="{:U('Organization/listorders')}" method="post">
+			<div class="table-actions">
+				<button class="btn btn-warning btn-small js-ajax-post" type="button" data-href="{:U('Organization/update')}">更新会员表</button>
+			</div>
+			<table class="table table-hover table-bordered table-list" id="menus-table">
+				<thead>
+					<tr>
+						<th width="100">ID</th>
+						<th>组织名称</th>
+						<th width="100">排序</th>
+						<th width="80">状态</th>
+						<th width="180">操作</th>
+					</tr>
+				</thead>
+				<tbody>
+				<volist name="list" id="val">
+					<tr id="{$val.id}" {$val.hasChild}>
+						<td>{$val.id}</td>
+						<td>{$val.name}</td>
+						<td>
+							<input name='sort[{$val.id}]' type='text' size='3' value='{$val.sort}' class='form-control input-sm input-order input-ajax'>
+						</td>
+						<td style='text-align:center;'><i class='fa {$val.status}'></i></td>
+						<td>
+							<a href="{:U('Organization/add', array('pid' => $val['id']))}">添加下级</a> | 
+							<a href="{:U('Organization/edit', array('id' => $val['id']))}">编辑</a> | 
+							<a href="{:U('Organization/delete', array('id' => $val['id']))}" class="js-ajax-delete" data-callback="removeAll">删除</a>
+						</td>
+					</tr>
+				</volist>
+				</tbody>
+				<tfoot>
+					<tr>
+						<th width="100">ID</th>
+						<th>组织名称</th>
+						<th width="100">排序</th>
+						<th width="80">状态</th>
+						<th width="180">操作</th>
+					</tr>
+				</tfoot>
+			</table>
+			<div class="table-actions">
+			</div>
+		</form>
+	</div>
+	<script src="__PUBLIC__/js/common.js"></script>
+	<script type="text/javascript">
+        $(function(){
+			Wind.use('myTreeTable', function() {
+	            var option = {
+	                theme:'vsStyle',
+	                expandLevel : 1,
+	                beforeExpand : function($treeTable, id) {
+	                    //判断id是否已经有了孩子节点，如果有了就不再加载，这样就可以起到缓存的作用
+	                    if ($('.' + id, $treeTable).length) { return; }
+						$.post("{:U('Organization/geiChilds')}",{id:id},function(data){
+							$treeTable.addChilds(data);
+						})
+	                },
+	                onSelect : function($treeTable, id) {
+	                    window.console && console.log('onSelect:' + id);
+						
+	                }
+	            };
+	            $('#menus-table').treeTable(option);
+			})
+        });
+		$(".table-list").on("change",".input-ajax",function(){
+			var id = $(this).parents('tr').attr("id");
+			var value = $(this).val();
+			var type = "sort";
+			parent.$loading.show();
+			if(id != null && value != null){
+				$.post("{:U('status')}",{id:id,value:value,type:type},function(data){
+					parent.$loading.hide();
+				})
+			}
+		})
+		
+		$(".table-list").on("click",".fa-check",function(){
+			var obj = $(this);
+			var id = obj.parents('tr').attr("id");
+			var type = "status";
+			parent.$loading.show();
+			$.post("{:U('status')}",{id:id,value:0,type:type},function(data){
+				obj.removeClass("fa-check");
+				obj.addClass("fa-close");
+				parent.$loading.hide();
+			})
+		})
+		
+		$(".table-list").on("click",".fa-close",function(){
+			var obj = $(this);
+			var id = obj.parents('tr').attr("id");
+			var type = "status";
+			parent.$loading.show();
+			$.post("{:U('status')}",{id:id,value:1,type:type},function(data){
+				obj.removeClass("fa-close");
+				obj.addClass("fa-check");
+				parent.$loading.hide();
+			})
+		})
+		
+		var removeAll = function($obj){
+			var id = $obj.attr("id");
+			$obj.remove();
+			$("tr[pid="+id+"]").each(function(){
+				removeAll($(this));
+			})
+		}
+    </script>
+</body>
+</html>

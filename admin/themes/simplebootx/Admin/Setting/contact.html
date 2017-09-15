@@ -1,0 +1,117 @@
+<admintpl file="header" />
+</head>
+<body>
+	<div class="wrap">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="#A" data-toggle="tab">网站信息</a></li>
+		</ul>
+		<div class="wrap">
+			<form method="post" class="js-ajax-form" action="">
+				<div class="tabbable">
+					<div class="tab-content">
+		          		<div class="tab-pane active" id="A">
+							<fieldset>
+								<!-- <div class="form-group">
+								    <label>首页关于我们文字</label>
+								    <ueditortpl name="options[info]" id="info" value="$options['info']"/>
+								</div> -->
+								<table cellpadding="2" cellspacing="2" width="100%" class="table table-bordered">
+									<tbody>
+										<tr>
+											<td>网站二维码：</td>
+											<td>
+												<table>
+													<tr>
+														<td style="border-left:0;">
+															网站二维码：<imagetpl name="options[img]" id="img" value="$options['img']"/>
+														</td>
+														<!-- <td style="border-left:0;">
+															网站二维码：<imagetpl name="options[img]" id="img" value="$options['img']"/>
+														</td> -->
+													</tr>
+												</table>
+											</td>
+										</tr>
+										<tr>
+											<td>SEO信息：</td>
+											<td>
+												<table>
+													<tr>
+														<td style="border-left:0;">
+															<table>
+																<tr>
+																	<td style="border-left:0;">
+																		SEO标题：<textarea name="options[title]" style="width: 98%; height: 100px;resize:vertical;">{$options.title}</textarea>
+																	</td>
+																</tr>
+															</table>
+														</td>
+														<td style="border-left:0;">
+															<table>
+																<tr>
+																	<td style="border-left:0;">
+																		SEO关键字：<textarea name="options[key]" style="width: 98%; height: 100px;resize:vertical;">{$options.key}</textarea>
+																	</td>
+																</tr>
+															</table>
+														</td>
+														<td style="border-left:0;">
+															<table>
+																<tr>
+																	<td style="border-left:0;">
+																		SEO描述：<textarea name="options[desc]" style="width: 150%; height: 100px;resize:vertical;">{$options.desc}</textarea>
+																	</td>
+																</tr>
+															</table>
+														</td>
+													</tr>
+												</table>
+											</td>
+										</tr>
+										<tr>
+											<td>分页参数：</td>
+											<td>
+												内容页：<input type="text" name="options[page_num_news]" value="{$options['page_num_news']}" style="width:30px; vertical-align: middle;" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'0')}else{this.value=this.value.replace(/\D/g,'')}"/>&nbsp;&nbsp;&nbsp;&nbsp;
+												产品页：<input type="text" name="options[page_num_pro]" value="{$options['page_num_pro']}" style="width:30px; vertical-align: middle;" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'0')}else{this.value=this.value.replace(/\D/g,'')}"/>&nbsp;&nbsp;&nbsp;&nbsp;
+												<span style="font-size:12px;color:red;">(前台每页显示多少条记录)</span>
+											</td>
+										</tr>
+										<!-- <tr>
+											<td>首页右侧<br>电话|QQ：</td>
+											<td>
+												电话：<input type="text" name="options[tel]" value="{$options['tel']}" style="width:350px; vertical-align: middle;"/>&nbsp;&nbsp;&nbsp;
+												QQ：<input type="text" name="options[qq]" value="{$options['qq']}" style="width:350px; vertical-align: middle;"/>
+											</td>
+										</tr> -->
+										<tr>
+											<td>版权信息：</td>
+											<td>
+												<input type="text" name="options[banquan]" value="{$options['banquan']}" style="width:500px; vertical-align: middle;"/>
+											</td>
+										</tr>
+										<tr>
+											<td>技术支持：</td>
+											<td>
+												<input type="text" name="options[zhichi]" value="{$options['zhichi']}" style="width:500px; vertical-align: middle;"/>
+											</td>
+										</tr>
+										
+									</tbody>
+								</table>
+								<div class="form-group">
+								    <label>地图坐标:</label>
+								    {:hook('BaiduMap',array('id'=>'map','name'=>'options[map]','value'=>$options['map']))}
+								</div>
+							</fieldset>
+						</div>
+					</div>
+				</div>
+				<div class="form-actions">
+					<button type="submit" class="btn btn-primary js-ajax-submit">{:L('SAVE')}</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<script src="__PUBLIC__/js/common.js"></script>
+</body>
+</html>

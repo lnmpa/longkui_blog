@@ -1,0 +1,33 @@
+<div style="text-align: left;">
+	<input type="hidden" name="ImagesSet-{images_label}" id="{images_id}-label" value="{{images_value}}">
+    <input type="hidden" name="{images_name}" id="{images_id}" value="{{images_value}}">
+        <if condition="empty({images_value})">
+			<a href="__TMPL__Public/assets/images/default-thumbnail.png" id="{images_id}-a" class="js-fancybox">
+            	<img src="__TMPL__Public/assets/images/default-thumbnail.png" id="{images_id}-preview" width="135" style="cursor: hand"/>
+			</a>
+		<else/>
+			<a href="{:sp_get_image_url({images_value})}" id="{images_id}-a" class="js-fancybox">
+				<img src="{:sp_get_image_url({images_value})}" id="{images_id}-preview" width="135" style="cursor: hand"/>
+        	</a>
+		</if>
+	<input type="button" class="btn btn-default btn-small" id="{images_id}-image-upload" value="取消图片">
+	<script>
+		$("#{images_id}-image-upload").click(function(){
+			var id = $('#{images_id}').val();
+			if(id != 0){
+				$.post("{:U('Asset/asset/delete_image')}",{id:id},function(data){
+					$('#{images_id}-preview').attr('src','__TMPL__Public/assets/images/default-thumbnail.png');
+					$('#{images_id}').val(0);
+				})
+			}
+			return false;
+		})
+		$("#{images_id}-a").click(function(){
+			var src = $("#{images_id}-preview").attr('src');
+			if(src == '__TMPL__Public/assets/images/default-thumbnail.png'){
+				upload_one_image('图片上传','#{images_id}');
+				return false;
+			}
+		})
+	</script>
+</div>

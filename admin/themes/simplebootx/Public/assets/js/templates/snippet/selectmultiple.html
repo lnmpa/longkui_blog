@@ -1,0 +1,9 @@
+<!-- Select Multiple -->
+<div class="control-group">
+  <label class="col-sm-2 control-label" for="<%- id %>"><%- label %></label>
+  <div class="col-sm-10">
+    <select id="<%- id %>" name="<%- id %>" class="<%- inputsize %>" multiple="multiple"><% _.each(options, function(option) { %>
+      <option><%- option %></option><% }); %>
+    </select>
+  </div>
+</div>

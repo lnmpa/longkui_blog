@@ -1,0 +1,33 @@
+<admintpl file="header" />
+<style>
+.container{
+	position: relative;
+    margin-top: 10px;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+</style>
+</head>
+<body>
+	<div class="container">
+		<button  class="btn" onclick="history.back(-1)"><i class="fa fa-mail-reply" style="color:#317eac;"></i></button>
+		<h3 class="text-center">{$data['title']}</h3>
+		<p class="text-right" style="color:#317eac;">{:date('Y年m月d日H:i',strtotime($data['add_time']))}&nbsp;{$data['orig']}</p>
+		<table width="100%" style="margin-bottom:20px;">
+			<tr>
+				<td style="line-height:1px;background-color:#317eac;">&nbsp;</td>
+			</tr>
+		</table>
+		<if condition="$data['img'] neq 0">
+			<p class="text-center">
+				<img src="{:sp_get_image_url($data['img'])}" width="100%" style="margin-right: auto;margin-left: auto;" class="img-polaroid"/>
+			</p>
+		</if>
+		{$data['info']}
+	</div>
+</body>
+</html>

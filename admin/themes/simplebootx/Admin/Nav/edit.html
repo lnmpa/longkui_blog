@@ -1,0 +1,105 @@
+<admintpl file="header" />
+</head>
+<body>
+	<div class="wrap">
+		<ul class="nav nav-tabs">
+			<li><a href="{:U('nav/index?cid='.$navcid)}">{:L('ADMIN_NAV_INDEX')}</a></li>
+			<li class="active"><a href="javascript:;">{:L('ADMIN_NAV_ADD')}</a></li>
+			<li><a href="{:U('nav/add_all',array('cid'=>$navcid))}">快速添加</a></li>
+		</ul>
+		<div class="common-form">
+			<form method="post" class="form-horizontal js-ajax-form" action="{:U(ACTION_NAME)}">
+				<fieldset>
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><span class="form-required">*</span>{:L('NAVIGATION_CATEGORY')}</label>
+						<div class="col-sm-10">
+							<select class="form-control" name="cid" id="navcid_select">
+								<foreach name="navcats" item="vo">
+								<php>$navcid_selected=$navcid==$vo['navcid']?"selected":"";</php>
+								<option value="{$vo.navcid}" {$navcid_selected}>{$vo.name}</option>
+								</foreach>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{:L('PARENT')}</label>
+						<div class="col-sm-10">
+							<select class="form-control" name="parentid">
+								<option value="0">/</option>
+								{$nav_trees}
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><span class="form-required">*</span>{:L('LABEL')}</label>
+						<div class="col-sm-10">
+							<input class="form-control" type="text" name="label" value="{$label}">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">副{:L('LABEL')}</label>
+						<div class="col-sm-10">
+							<input class="form-control" type="text" name="sub_label" value="{$sub_label}">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{:L('HREF')}</label>
+						<div class="col-sm-10">
+							<input class="form-control" type="text" name="href" id="outlink_input" value="{$href}">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">图片</label>
+						<div class="col-sm-10">
+							<imagetpl name="img" id="img" value="$img"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{:L('TARGET')}</label>
+						<div class="col-sm-10">
+							<select class="form-control" name="target">
+								<option value="">{:L('TARGET_DEFAULT')}</option>
+								<php>$target_selected=empty($target)?"":"selected";</php>
+								<option value="_blank" {$target_selected}>{:L('TARGET_BLANK')}</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{:L('ICON')}</label>
+						<div class="col-sm-10">
+							<input class="form-control" type="text" name="icon" value="{$icon}">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{:L('STATUS')}</label>
+						<div class="col-sm-10">
+							<select class="form-control" name="status">
+								<option value="1">{:L('DISPLAY')}</option>
+								<php>$status_selected=empty($status)?"selected":"";</php>
+								<option value="0" {$status_selected}>{:L('HIDDEN')}</option>
+							</select>
+						</div>
+					</div>
+				</fieldset>
+				<div class="form-actions">
+					<input type="hidden" name="id" value="{$id}">
+					<button type="submit" class="btn btn-primary js-ajax-submit">{:L('SAVE')}</button>
+					<a class="btn btn-default" href="javascript:history.back(-1);">{:L('BACK')}</a>
+				</div>
+			</form>
+		</div>
+	</div>
+	<script src="__PUBLIC__/js/common.js"></script>
+	<script>
+		$(function() {
+			$("#navcid_select").change(function() {
+				if(location.search.indexOf("?")>=0){
+					location.href = location.href + "&cid=" + $(this).val();
+				}else{
+					location.href = location.href + "?cid=" + $(this).val();
+				}
+			});
+		});
+	</script>
+</body>
+</html>

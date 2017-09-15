@@ -1,0 +1,227 @@
+<admintpl file="header" />
+</head>
+<body>
+	<div class="wrap js-check-wrap">
+		<ul class="nav nav-tabs">
+			<li><a href="{:U('index',array('cate_id'=>$cate_id))}">视频列表</a></li>
+			<li class="active"><a href="javascript:;">{$meta_title}视频</a></li>
+		</ul>
+		<form action="{:U(ACTION_NAME)}" method="post" class="form-horizontal js-ajax-forms" enctype="multipart/form-data">
+			<div class="tabbable tabs-left">
+				<div class="tabs-left">
+					<ul class="nav nav-pills nav-stacked">
+				        <li class="active"><a href="#A" data-toggle="tab">基本信息</a></li>
+						<li><a href="#B" data-toggle="tab">状态信息</a></li>
+				    </ul>
+				</div>
+		        <div class="tab-content">
+		          <div class="tab-pane active" id="A">
+						<fieldset>
+							<div class="form-group">
+							    <label>分类</label>
+							    <select class="form-control" name="cate_id">
+									<option value="">==请选择==</option>
+									{$taxonomys}
+								</select>
+							</div>
+							<div class="form-group">
+							    <label>标题</label>
+							    <input type="text" class="form-control" name="title" id="title" required value="{$data['title']}" placeholder="请输入标题"/>
+								<span class="form-required">*</span>
+							</div>
+							<div class="form-group">
+							    <label>图片</label>
+							    <imagetpl name="img" id="img" value="$data['img']"/>
+							</div>
+							<div class="form-group">
+							    <label>学分</label>
+							    <input type="text" name="study_time" id="study_time" value="{$data['study_time']}" class="form-control">
+							</div>
+							<div class="form-group">
+							    <label>视频路径</label>
+							    <input type="text" name="video" id="video" value="{$data['video']}" class="form-control">
+							</div>
+							<div class="form-group">
+							    <label>视频简介</label>
+							    <textarea name="subject_info" class="form-control" placeholder="请输入视频简介">{$data['subject_info']}</textarea>
+							</div>
+							<div class="form-group">
+							    <label>播放时长（分钟）</label>
+							    <input type="text" name="video_time" id="video_time" value="{$data['video_time']}" class="form-control">
+							</div>
+							<div class="form-group">
+							    <label>讲师</label>
+							    <input type="text" name="speaker" id="speaker" value="{$data['speaker']}" class="form-control">
+							</div>
+							<div class="form-group">
+							    <label>所属专辑</label>
+								<input type="text" name="album" id="album" value="{$data['album']}" class="form-control">
+							</div>
+						</fieldset>
+					</div>
+					<div class="tab-pane" id="B">
+						<fieldset>
+							<div class="form-group">
+								<label>审核状态</label>
+								<div>
+									<label class="radio-inline js-icheck"><input type="radio" class="form-control" name="status" value="1" <if condition="$data['status'] eq 1">checked</if>>审核通过</label>
+									<label class="radio-inline js-icheck"><input type="radio" class="form-control" name="status" value="0" <if condition="$data['status'] neq 1">checked</if>>待审核</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label>是否置顶</label>
+								<div>
+									<label class="radio-inline js-icheck"><input type="radio" name="is_top" value="1" <if condition="$data['is_top'] eq 1">checked</if>>置顶</label>
+									<label class="radio-inline js-icheck"><input type="radio" name="is_top" value="0" <if condition="$data['is_top'] neq 1">checked</if>>未置顶</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label>是否推荐</label>
+								<div>
+									<label class="radio-inline js-icheck"><input type="radio" name="is_best" value="1" <if condition="$data['is_best'] eq 1">checked</if>>推荐</label>
+									<label class="radio-inline js-icheck"><input type="radio" name="is_best" value="0" <if condition="$data['is_best'] neq 1">checked</if>>未推荐</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label>是否热门</label>
+								<div>
+									<label class="radio-inline js-icheck"><input type="radio" name="is_hot" value="1" <if condition="$data['is_hot'] eq 1">checked</if>>热门</label>
+									<label class="radio-inline js-icheck"><input type="radio" name="is_hot" value="0" <if condition="$data['is_hot'] neq 1">checked</if>>非热门</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label>发布时间</label>
+								<input type="text" class="form-control js-datetime" name="add_time" value="<if condition="$data['add_time'] eq null">{:date('Y-m-d H:i:s',time())}<else/>{$data['add_time']}</if>">
+							</div>
+						</fieldset>
+					</div>
+				</div>
+		    </div>
+			<div class="form-actions">
+				<input type="hidden" name="id" value="{$data['id']}"/>
+				<button class="btn btn-primary js-ajax-submit" type="submit">提交</button>
+				<a class="btn btn-default" href="javascript:history.back(-1);">返回</a>
+			</div>
+		</form>
+	</div>
+	<script type="text/javascript" src="__PUBLIC__/js/common.js"></script>
+	<script type="text/javascript">
+		$(function() {
+			Wind.use('validate', 'ajaxForm', 'artDialog', function() {
+				
+				
+				var form = $('form.js-ajax-forms');
+				
+				//ie处理placeholder提交问题
+				if ($.browser && $.browser.msie) {
+					form.find('[placeholder]').each(function() {
+						var input = $(this);
+						if (input.val() == input.attr('placeholder')) {
+							input.val('');
+						}
+					});
+				}
+				
+				var formloading = false;
+				//表单验证开始
+				form.validate({
+					//是否在获取焦点时验证
+					onfocusout : true,
+					//是否在敲击键盘时验证
+					onkeyup : false,
+					//当鼠标掉级时验证
+					onclick : false,
+					//验证错误
+					showErrors : function(errorMap, errorArr) {
+						//errorMap {'name':'错误信息'}
+						//errorArr [{'message':'错误信息',element:({})}]
+						try {
+							$(errorArr[0].element).focus();
+							art.dialog({
+								id : 'error',
+								icon : 'error',
+								lock : true,
+								fixed : true,
+								background : "#CCCCCC",
+								opacity : 0,
+								content : errorArr[0].message,
+								cancelVal : '确定',
+								cancel : function() {
+									$(errorArr[0].element).focus();
+								}
+							});
+						} catch (err) {
+						}
+					},
+					//验证规则
+					rules : {
+						'title' : "required",
+						'study_time' : "required",
+						'video' : "required",
+						'subject_info' : "required",
+						'video_time' : "required",
+					},
+					//验证未通过提示消息
+					messages : {
+						'title' : '标题不能为空!',
+						'study_time' : "学分不能为空!",
+						'video' : "视频路径不能为空!",
+						'subject_info' : "视频简介不能为空!",
+						'video_time' : "播放时长（分钟）不能为空!",
+					},
+					//给未通过验证的元素加效果,闪烁等
+					highlight : false,
+					//是否在获取焦点时验证
+					onfocusout : false,
+					//验证通过，提交表单
+					submitHandler : function(forms) {
+						if (formloading)
+							return;
+						$(forms).ajaxSubmit({
+							url : form.attr('action'), //按钮上是否自定义提交地址(多按钮情况)
+							dataType : 'json',
+							beforeSubmit : function(arr, $form, options) {
+								formloading = true;
+							},
+							success : function(data, statusText, xhr, $form) {
+								formloading = false;
+								if (data.status) {
+									setCookie("refersh_time", 1);
+									//修改成功
+									Wind.use("artDialog", function() {
+										art.dialog({
+											id : "succeed",
+											icon : "succeed",
+											fixed : true,
+											lock : true,
+											background : "#CCCCCC",
+											opacity : 0,
+											content : data.info,
+											button : [ {
+												name : '继续{$meta_title}？',
+												callback : function() {
+													reloadPage(window);
+													return true;
+												},
+												focus : true
+											}, {
+												name : '返回列表页',
+												callback : function() {
+													location = "{:U('Video/index',array('cate_id'=>$cate_id))}";
+													return true;
+												}
+											} ]
+										});
+									});
+								} else {
+									artdialog_alert(data.info);
+								}
+							}
+						});
+					}
+				});
+			});
+		});
+	</script>
+</body>
+</html>

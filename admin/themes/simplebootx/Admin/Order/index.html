@@ -1,0 +1,183 @@
+<admintpl file="header" />
+</head>
+<body>
+	<div class="wrap js-check-wrap">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="javascript:;">订单列表</a></li>
+		</ul>
+		<form class="well form-inline" method="post" action="{:U('index')}">
+			订单编号： 
+			<input class="form-control input-sm" type="text" name="order_sn" style="width: 200px;" value="{$order_sn|default=''}" placeholder="请输入订单编号...">
+			下单时间：
+			<input type="text" name="start_time" class="form-control input-sm js-datetime" value="{$start_time|default=''}" style="width: 120px;" autocomplete="off" placeholder="请输入开始时间...">-
+			<input type="text" name="end_time" class="form-control input-sm js-datetime" value="{$end_time|default=''}" style="width: 120px;" autocomplete="off" placeholder="请输入结束时间...">
+			<input type="submit" class="btn btn-primary" value="搜索" />
+		</form>
+		<form class="js-ajax-form" action="" method="post">
+			<div class="table-actions">
+				<button class="btn btn-danger btn-small js-ajax-submit" type="submit" data-action="{:U('delete')}" data-subcheck="true" data-msg="您确定删除吗？">删除</button>
+			</div>
+			<table class="table table-hover table-bordered table-list">
+				<thead>
+					<tr>
+						<th width="15">
+							<label><input type="checkbox" class="js-check-all" data-direction="x" data-checklist="js-check-x"></label>
+						</th>
+						<th width="40">序号</th>
+						<th>订单编号</th>
+						<th width="100">下单帐号</th>
+						<th width="80">联系人</th>
+						<th width="100">联系电话</th>
+						<th width="120">下单时间</th>
+						<th width="60">商品数量</th>
+						<th width="120">订单状态</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<foreach name="list" item="vo">
+				<tr data-id="{$vo.id}" data-name="{$vo.order_sn}">
+					<td><input type="checkbox" class="js-check" data-yid="js-check-y" data-xid="js-check-x" name="ids[]" value="{$vo.id}" title="ID:{$vo.id}"></td>
+                    <td>{$vo.id}</td>
+			        <td>{$vo.order_sn}</td>
+			        <td>{$vo.user_name}</td>
+					<td>{$vo.name}</td>
+			        <td>{$vo.mobile}</td>
+					<td>{$vo.create_time}</td>
+					<td>{$vo.pack_num}</td>
+					<td>{$vo.status_info}<if condition="$vo['shouhou_pack_num'] gt 0">(售后中)</if></td>
+					<td>
+						<if condition="$vo['status'] eq 2">
+							<a href="{:U('sendGoods?id='.$vo['id'])}" class="sendGoods" <if condition="$vo['shouhou_pack_num'] gt 0">in_shouhou="true"</if>>发货</a>
+						</if>
+						<a href="{:U('showOrder?id='.$vo['id'])}" class="showOrder">详情</a>
+					</td>
+				</tr>
+				</foreach>
+			</table>
+			<div class="table-actions">
+				<button class="btn btn-danger btn-small js-ajax-submit" type="submit" data-action="{:U('delete')}" data-subcheck="true" data-msg="您确定删除吗？">删除</button>
+			</div>
+			<ul class="pagination">{$page}</ul>
+		</form>
+	</div>
+	<script src="__PUBLIC__/js/common.js"></script>
+	<script>
+		$(".table-list").on("click",".sendGoods",function(){
+			$this = $(this);
+			var id = $this.parents('tr').attr('data-id');
+			var name = $this.parents('tr').attr('data-name');
+			var href = $this.attr("href");
+			var in_shouhou = $this.attr("in_shouhou");
+			Wind.use("artDialog","iframeTools",function(){
+				if(in_shouhou){
+					art.dialog({
+                        content: "存在退款商品的订单无法发货，请先处理退款申请，拒绝退款后可继续发货",
+                        icon: 'warning',
+						okVal:'跳转至退款列表',
+                        ok: function () {
+                            parent.openapp("{:U('Order/refundMoneyList')}",'300Admin','退款列表',true);
+                            return true;
+                        },
+						cancelVal:'关闭',
+						cancel: function(){
+							
+							return true;
+						}
+                    });
+					return false;
+				}
+		        art.dialog.open(href, {
+			        title: "发货单:"+name,
+			        id: new Date().getTime(),
+			        width: '400px',
+			        height: '140px',
+			        lock: true,
+			        fixed: true,
+			        background:"#CCCCCC",
+			        opacity:0,
+			        ok: function() {
+						var iframewindow = this.iframe.contentWindow;
+			            $form = iframewindow.$("#form");
+						var send_express = $form.find(":input[name='send_express']").val();
+						var send_express_sn = $form.find(":input[name='send_express_sn']").val();
+						if(send_express == '' || send_express == null || typeof(send_express) == 'undefined'){
+							art.dialog({
+		                        content: "物流公司不能为空",
+		                        icon: 'warning',
+		                        ok: function () {
+		                            this.title("物流公司不能为空");
+		                            return true;
+		                        }
+		                    });
+							return false;
+						}
+						if(send_express_sn == '' || send_express_sn == null || typeof(send_express_sn) == 'undefined'){
+							art.dialog({
+		                        content: "物流编号不能为空",
+		                        icon: 'warning',
+		                        ok: function () {
+		                            this.title("物流编号不能为空");
+		                            return true;
+		                        }
+		                    });
+							return false;
+						}
+						var action = $form.attr("action");
+						var query = $form.serialize();
+						top.$loading.show();
+						$.post(action,query,function(data){
+							top.$loading.hide();
+							if(data.status == 1){
+								art.dialog({
+			                        content: data.info,
+									lock:true,
+			                        icon: 'succeed',
+			                        ok: function () {
+			                            reloadPage(window);
+			                            return true;
+			                        }
+			                    });
+							}
+							else{
+								art.dialog({
+			                        content: data.info,
+			                        icon: 'warning',
+			                        ok: function () {
+			                            this.title(data.info);
+			                            return true;
+			                        }
+			                    });
+							}
+						})
+						return false;
+			        },
+			        cancel: true
+			    });
+		    });
+			return false;
+		})
+		$(".table-list").on("click",".showOrder",function(){
+			$this = $(this);
+			var id = $this.parents('tr').attr('data-id');
+			var name = $this.parents('tr').attr('data-name');
+			var href = $this.attr("href");
+			
+			Wind.use("artDialog","iframeTools",function(){
+		        art.dialog.open(href, {
+			        title: "订单详情:"+name,
+			        id: new Date().getTime(),
+			        width: '800px',
+			        height: '450px',
+			        lock: true,
+			        fixed: true,
+			        background:"#CCCCCC",
+			        opacity:0,
+					cancelVal: '关闭',
+			        cancel: true
+			    });
+		    });
+			return false;
+		})
+	</script>
+</body>
+</html>

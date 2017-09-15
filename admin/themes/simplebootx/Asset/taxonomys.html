@@ -1,0 +1,39 @@
+<assign name="{taxonomys_id}_value" value="{taxonomys_value}" />
+<assign name="{taxonomys_id}_more" value="{taxonomys_more}" />
+<assign name="{taxonomys_id}_treeData" value="{treeData}" />
+<php>
+${taxonomys_id}_text_list = sp_search_array(${taxonomys_id}_treeData,${taxonomys_id}_value,'id');
+${taxonomys_id}_text = ${taxonomys_id}_value==0?'==请选择==':${taxonomys_id}_text_list[0]['name'];
+</php>
+<if condition="empty(${taxonomys_id}_more)">
+	<link rel="stylesheet" href="__PUBLIC__/js/zTree/css/metroStyle/metroStyle.css" type="text/css">
+	<script src="__PUBLIC__/js/zTree/js/jquery.ztree.core.js"></script>
+</if>
+<input type="text" id="{taxonomys_id}_text" value="{${taxonomys_id}_text}" class="form-control {taxonomys_class}" style="{taxonomys_style}" readonly/>
+<input type="hidden" name="{taxonomys_name}" id="{taxonomys_id}" value="{${taxonomys_id}_value}"/>
+<ul id="{taxonomys_id}treeDemo" class="ztree" style="display:none;width:400px;height:300px;overflow-x:auto;"></ul>
+<script>
+	$("#{taxonomys_id}_text").click(function(){
+		var {taxonomys_id}setting = {	};
+
+		var {taxonomys_id}zNodes =  [{name:"==请选择==",click:"{taxonomys_id}changeMenu(0,'==请选择==')"},{:sp_get_tree_data(${taxonomys_id}_treeData,0,'{taxonomys_id}changeMenu')}];
+	
+		$(document).ready(function(){
+			$.fn.zTree.init($("#{taxonomys_id}treeDemo"), {taxonomys_id}setting, {taxonomys_id}zNodes);
+		});
+		
+		var {taxonomys_id}treeDemo = $("#{taxonomys_id}treeDemo")[0];
+		
+		Wind.use('artDialog', function () {
+			art.dialog({
+				title:"选择项目",
+                content: {taxonomys_id}treeDemo,
+            });
+		})
+	})
+	function {taxonomys_id}changeMenu(id,name){
+		$("#{taxonomys_id}").val(id);
+		$("#{taxonomys_id}_text").val(name);
+		$(".aui_close").click();
+	}
+</script>

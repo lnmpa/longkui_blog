@@ -1,0 +1,48 @@
+<admintpl file="header" />
+</head>
+<body>
+	<div class="wrap js-check-wrap">
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="javascript:;">加盟申请</a></li>
+		</ul>
+		<form class="js-ajax-form" action="" method="post">
+			<div class="table-actions">
+				<button class="btn btn-danger btn-small js-ajax-submit" type="submit" data-action="{:U('Apply/delete')}" data-subcheck="true" data-msg="您确定删除吗？">删除</button>
+			</div>
+			<table class="table table-hover table-bordered table-list">
+				<thead>
+					<tr>
+						<th width="15">
+							<label><input type="checkbox" class="js-check-all" data-direction="x" data-checklist="js-check-x"></label>
+						</th>
+						<th>序号</th>
+						<th>姓名</th>
+						<th>地址</th>
+						<th>手机</th>
+						<th>E-mail</th>
+						<th>内容</th>
+						<th>添加时间</th>
+					</tr>
+				</thead>
+				<foreach name="list" item="vo">
+				<tr data-id="{$vo.id}">
+					<td><input type="checkbox" class="js-check" data-yid="js-check-y" data-xid="js-check-x" name="ids[]" value="{$vo.id}" title="ID:{$vo.id}"></td>
+                    <td>{$vo.id}</td>
+					<td>{$vo.name}</td>
+			        <td>{$vo.address}</td>
+			        <td>{$vo.phone}</td>
+					<td>{$vo.email}</td>
+			        <td>{$vo.content}</td>
+					<td>{$vo.add_time}</td>
+				</tr>
+				</foreach>
+			</table>
+			<div class="table-actions">
+				<button class="btn btn-danger btn-small js-ajax-submit" type="submit" data-action="{:U('Apply/delete')}" data-subcheck="true" data-msg="您确定删除吗？">删除</button>
+			</div>
+			<ul class="pagination">{$page}</ul>
+		</form>
+	</div>
+	<script src="__PUBLIC__/js/common.js"></script>
+</body>
+</html>

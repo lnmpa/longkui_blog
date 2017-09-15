@@ -1,0 +1,122 @@
+<admintpl file="header" />
+<link rel="stylesheet" href="__PUBLIC__/js/zTree/css/metroStyle/metroStyle.css" type="text/css">
+<script src="__PUBLIC__/js/zTree/js/jquery.ztree.core.js"></script>
+</head>
+<body>
+	<div class="wrap">
+		<empty name="parentid">
+			<ul class="nav nav-tabs">
+				<li><a href="{:U('menu/index')}">{:L('ADMIN_MENU_INDEX')}</a></li>
+				<li class="active"><a href="{:U('menu/add')}">{:L('ADMIN_MENU_ADD')}</a></li>
+			</ul>
+		</empty>
+		<form method="post" class="form-horizontal js-ajax-form" action="{:U('Menu/add_post')}">
+			<fieldset>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">上级:</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="text" id="parentid_text" value="{$parentid_text}" readonly/>
+						<input type="hidden" name="parentid" id="parentid" value="{$parentid}"/>
+						<ul id="treeDemo" class="ztree" style="display:none;width:400px;height:300px;overflow-x:auto;"></ul>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label"><span class="form-required">*</span>名称:</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="text" name="name">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label"><span class="form-required">*</span>应用:</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="text" name="app" id="app">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label"><span class="form-required">*</span>控制器:</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="text" name="model" id="model">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label"><span class="form-required">*</span>方法:</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="text" name="action" id="action">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">参数:</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="text" name="data">
+						例:id=3&amp;p=3
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">图标:</label>
+					<div class="col-sm-10">
+						<input class="form-control" type="text" name="icon" id="action">
+						<a href="http://www.thinkcmf.com/font/icons" target="_blank">选择图标</a> 不带前缀fa-，如fa-user => user
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">备注:</label>
+					<div class="col-sm-10">
+						<textarea class="form-control" name="remark" rows="5" cols="57" style="width: 500px;"></textarea>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">状态:</label>
+					<div class="col-sm-10">
+						<select class="form-control" name="status">
+							<option value="1">显示</option>
+							<option value="0">隐藏</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">类型:</label>
+					<div class="col-sm-10">
+						<select class="form-control" name="type">
+							<option value="1" selected>权限认证+菜单</option>
+							<option value="0">只作为菜单</option>
+						</select>
+						注意：“权限认证+菜单”表示加入后台权限管理，纯碎是菜单项请不要选择此项。
+					</div>
+				</div>
+			</fieldset>
+			<empty name="parentid">
+				<div class="form-actions">
+					<button type="submit" class="btn btn-primary js-ajax-submit">{:L('ADD')}</button>
+					<a class="btn btn-default" href="javascript:history.back(-1);">{:L('BACK')}</a>
+				</div>
+			</empty>
+		</form>
+	</div>
+	<script src="__PUBLIC__/js/common.js"></script>
+	<script>
+		$("#parentid_text").click(function(){
+			var setting = {	};
+
+			var zNodes = {$tree_categorys};
+		
+			$(document).ready(function(){
+				$.fn.zTree.init($("#treeDemo"), setting, zNodes);
+			});
+			
+			var treeDemo = $("#treeDemo")[0];
+			
+			Wind.use('artDialog', function () {
+				art.dialog({
+					title:"选择上级",
+                    content: treeDemo,
+                });
+			})
+		})
+		function changeMenu(id,name){
+			$("#parentid").val(id);
+			$("#parentid_text").val(name);
+			$(".aui_close").click();
+		}
+	</script>
+</body>
+</html>

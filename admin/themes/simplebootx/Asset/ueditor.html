@@ -1,0 +1,15 @@
+<textarea type="text/plain" id="{ueditor_id}" name="{ueditor_name}" style="height: 200px;resize:vertical;">{{ueditor_value}}</textarea>
+<if condition="$more == false">
+	<script type="text/javascript" src="__PUBLIC__/js/ueditor/ueditor.config.js"></script>
+	<script type="text/javascript" src="__PUBLIC__/js/ueditor/ueditor.all.js"></script>
+</if>
+<script>
+$(function() {
+	var editor_{ueditor_label} = UE.getEditor('{ueditor_id}',{
+	    autoHeight: false,
+		initialFrameHeight:200,//设置编辑器高度
+		initialFrameWidth:'100%',
+		scaleEnabled:true
+	});
+})
+</script>

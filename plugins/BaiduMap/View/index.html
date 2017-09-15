@@ -1,0 +1,226 @@
+<div >
+    <link rel="stylesheet" href="__PLUGINTMPL__js/artdialog/ui-dialog.css">
+    <script type="text/javascript" src="__PLUGINTMPL__js/artdialog/dialog-min.js"></script>
+    <script type="text/javascript" src="__PLUGINTMPL__js/artdialog/dialog-plus-min.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=1.5&ak=tkQLLZNG9GEfIwxlNHBFvVATsNNM50dU"></script>
+    <!--<div>坐标格式：lng,lat</div>-->
+    <style>
+        .search-result {
+            width: 239px;
+            max-height: 565px;
+            overflow-y: auto;
+        }
+
+        .tangram-suggestion-main {
+            z-index: 9999;
+        }
+    </style>
+    <label class="form-inline">
+        <input type="text"  class="form-control" style="width:400px;" id="input_{$param['id']}" name="{$param['name']}" value="{$param['value']}">
+        <a id="map_box_{$param['id']}_a">定位 </a> </label>
+    <script type="text/javascript">
+        $(function () {
+            !function () {
+                //map元素
+                var mapBoxDialog = null;
+                //jq el
+                var mapValueInput = $("#input_{$param['id']}");
+                var mapValue = mapValueInput.val();
+                mapValue = mapValue.split(',');
+                var zoomDefault = parseInt(mapValue[2]);
+                zoomDefault = zoomDefault > 0 ? zoomDefault : 15;
+                var mapId = "map_box_{$param['id']}";
+                var mapA = $("#map_box_{$param['id']}_a");
+                var map = null;
+                var infoDialog = null;
+                var infoDialogTimeout = null;
+
+                var searchDialog = null;
+                var searchInputId = "searchInput_{$param['id']}";
+                var searchAuto = null;
+                var myValue;
+                var initSearchDialog = function () {
+//                    console.info(searchDialog);
+                    if (searchDialog != null) {
+                        searchDialog.close().remove();
+                        searchDialog = null;
+                        return;
+                    }
+                    searchDialog = dialog({
+                        align: 'right top',
+                        content: '<div><label>地点：<input id="' + searchInputId + '"></label></div>'
+                    });
+                    searchDialog.show(document.getElementById('content:' + mapId));
+                    searchAuto = new BMap.Autocomplete({"input": searchInputId, "location": map});
+                    searchAuto.addEventListener("onhighlight", function (e) {  //鼠标放在下拉列表上的事件
+                        var str = "";
+                        var _value = e.fromitem.value;
+                        var value = "";
+                        if (e.fromitem.index > -1) {
+                            value = _value.province + _value.city + _value.district + _value.street + _value.business;
+                        }
+                        str = "FromItem<br />index = " + e.fromitem.index + "<br />value = " + value;
+
+                        value = "";
+                        if (e.toitem.index > -1) {
+                            _value = e.toitem.value;
+                            value = _value.province + _value.city + _value.district + _value.street + _value.business;
+                        }
+                        str += "<br />ToItem<br />index = " + e.toitem.index + "<br />value = " + value;
+//                        console.info(str);
+                    });
+                    searchAuto.addEventListener("onconfirm", function (e) {    //鼠标点击下拉列表后的事件
+                        var _value = e.item.value;
+                        myValue = _value.province + _value.city + _value.district + _value.street + _value.business;
+                        setPlace();
+                    });
+                    function setPlace() {
+                        map.clearOverlays();    //清除地图上所有覆盖物
+                        function myFun() {
+//                            console.info(local.getResults().si.length);
+                            if (local.getResults().si.length > 0) {
+                                var pp = local.getResults().getPoi(0).point;    //获取第一个智能搜索的结果
+//                                console.info(pp);
+                                setPosition(pp.lng, pp.lat);
+                                map.centerAndZoom(pp, zoomDefault);
+								var myIcon = new BMap.Icon("__PLUGINTMPL__/img/dq.png", new BMap.Size(14, 10), {
+							        offset:new BMap.Size(0, 125)
+							    });
+		                        var marker = new BMap.Marker(new BMap.Point(pp.lng, pp.lat), {
+							        icon:myIcon
+							    });
+		                        map.addOverlay(marker);//添加标注
+                                //map.addOverlay(new BMap.Marker(pp));    
+                            } else {
+                                showInfoDialog('无定位数据，请重新搜索');
+                            }
+                        }
+
+                        var local = new BMap.LocalSearch(map, { //智能搜索
+                            onSearchComplete: myFun
+                        });
+                        local.search(myValue);
+                    }
+                };
+
+                mapA.bind('click', function () {
+                    mapBoxDialog = dialog({
+                        id: mapId,
+                        title: '地图定位',
+                        content: "<div style='width: 100%;height: 100%;'></div>",
+                        width: 600,
+                        height: 400,
+                        onremove: function () {
+                            if (searchDialog && searchDialog.close) {
+                                searchDialog.close().remove();
+                                searchDialog = null;
+                            }
+                        },
+                        button: [
+                            {
+                                value: '搜索',
+                                callback: function () {
+                                    initSearchDialog();
+                                    return false;
+                                }
+                            }
+                        ],
+                        onshow: function () {
+                            initMap();
+                        }
+
+                    });
+                    mapBoxDialog.show();
+                });
+                var setPosition = function (lng, lat) {
+                    mapValue[0] = lng;
+                    mapValue[1] = lat;
+                    //mapValue[2] = zoomDefault;
+                    mapValueInput.val(mapValue.join(','));
+                    showInfoDialog();
+                }
+                var setZoom = function (zoom) {
+                    if (mapValue[0] > 0 && mapValue[1] > 0) {
+                        mapValue[2] = zoom;
+                        mapValueInput.val(mapValue.join(','));
+                    }
+                }
+                var showInfoDialog = function (msg) {
+                    msg = msg ? msg : '定位成功';
+                    if (infoDialog != null) {
+                        infoDialog.close().remove();
+                        clearTimeout(infoDialogTimeout);
+                    }
+                    infoDialog = dialog({
+                        align: 'right',
+                        content: msg
+                    });
+                    infoDialog.show(document.getElementById('content:' + mapId));
+                    infoDialogTimeout = setTimeout(function () {
+                        infoDialog.close().remove();
+//                        console.info('remove');
+                    }, 1500);
+                };
+                var initMap = function () {
+                    map = new BMap.Map('content:' + mapId);          // 创建地图实例
+                    var point = new BMap.Point(120.269193, 30.192058);  // 创建点坐标
+                    var marker = null;
+                    map.centerAndZoom(point, 15);
+					//map.setDefaultCursor("url('bird.cur')");
+					map.setDefaultCursor("crosshair");
+                    //控件
+                    map.addControl(new BMap.NavigationControl());
+                    map.addControl(new BMap.ScaleControl());
+                    map.addControl(new BMap.OverviewMapControl());
+                    map.addControl(new BMap.MapTypeControl());
+					
+                    //事件
+                    map.enableScrollWheelZoom(true);
+//                    设置定位
+                    var fetchPosition = function (e) {
+                        createMark(e.point.lng, e.point.lat);
+                        setPosition(e.point.lng, e.point.lat);
+                    };
+//                    设置缩放级别
+                    var fetchZoom = function () {
+                        setZoom(this.getZoom());
+                    };
+                    map.addEventListener("click", fetchPosition);
+                    map.addEventListener("zoomend", fetchZoom);
+					
+//                    创建标注
+                    var createMark = function (lng, lat) {
+                        clearMark();
+						var myIcon = new BMap.Icon("__PLUGINTMPL__/img/icon1.png", new BMap.Size(40, 40), {
+					        offset:new BMap.Size(0, 0)
+					    });
+                        marker = new BMap.Marker(new BMap.Point(lng, lat), {
+					        icon:myIcon
+					    });
+                        map.addOverlay(marker);
+                    }
+//                    清理标注
+                    var clearMark = function () {
+                        map.clearOverlays();
+                    }
+
+//                    ip定位城市
+                    var setCity = function (result) {
+                        var cityName = result.name;
+                        //map.setCenter(cityName);
+                        if (mapValue[0] > 0 && mapValue[1] > 0) {
+                            setTimeout(function(){
+                               var point=new BMap.Point(mapValue[0], mapValue[1]);
+                                map.centerAndZoom(point, zoomDefault);
+                                map.setCenter(point);
+                                createMark(mapValue[0], mapValue[1]);
+                            },200);
+                        }
+                    }
+                    var myCity = new BMap.LocalCity();
+                    myCity.get(setCity);
+                };
+            }();
+        });
+    </script>
+</div>
