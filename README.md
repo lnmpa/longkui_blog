@@ -1,3 +1,3 @@
 # longkui_blog
 this just is the secend demo!
-这是第一次上传练习
+通用的个人blog网站程序，后台基本不用改，基于think PHP3.2
